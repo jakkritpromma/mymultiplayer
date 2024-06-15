@@ -1,6 +1,7 @@
 package com.example.mymultiplayer.adapter
 
 import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,17 +13,18 @@ import com.example.mymultiplayer.model.CountryModel
 
 
 class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryListAdapter.MyViewHolder>() {
-    private var countryList: List<CountryModel>? = null
 
+    companion object {
+        private val TAG = CountryListAdapter::class.qualifiedName
+    }
+
+    private var countryList: List<CountryModel>? = null
 
     fun setCountryList(countryList: List<CountryModel>?) {
         this.countryList = countryList
     }
 
-    override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
-    ): CountryListAdapter.MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryListAdapter.MyViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.country_list_row, parent, false)
 
         return MyViewHolder(view)
@@ -33,7 +35,7 @@ class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryL
     }
 
     override fun getItemCount(): Int {
-        if(countryList == null)return 0
+        if (countryList == null) return 0
         else return countryList?.size!!
     }
 
@@ -43,8 +45,18 @@ class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryL
         val tvLang = view.findViewById<TextView>(R.id.tvLang)
 
         fun bind(data: CountryModel, activity: Activity) {
-            tvName.text = "aa"
-            tvLang.text = "bb"
+            val commonName = data.name?.get("common").toString()
+            tvName.text = commonName.substring(1, commonName.length - 1)
+
+            val mutableSet: MutableSet<String>? = data.languages?.keySet()
+            if (mutableSet != null) {
+                Log.d(TAG, "mutableSet.toList().get(0): " + mutableSet.toList().get(0))
+                val firstKey = mutableSet.toList().get(0)
+                val firstValue = data.languages.get(firstKey).toString()
+                val language = firstValue.substring(1, firstValue.length - 1)
+                Log.d(TAG, "language: $language")
+                tvLang.text = language
+            }
         }
     }
 
