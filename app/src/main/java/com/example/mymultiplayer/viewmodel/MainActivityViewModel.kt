@@ -13,7 +13,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivityViewModel : ViewModel() {
-    private val TAG = MainActivityViewModel::class.qualifiedName
+    private val TAG = MainActivityViewModel::class.simpleName
     lateinit var liveDataList: MutableLiveData<List<CountryModel>>
 
     init {

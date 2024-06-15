@@ -16,7 +16,7 @@ import com.squareup.picasso.Picasso
 class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryListAdapter.MyViewHolder>() {
 
     companion object {
-        private val TAG = CountryListAdapter::class.qualifiedName
+        private val TAG = CountryListAdapter::class.simpleName
     }
 
     private var countryList: List<CountryModel>? = null
