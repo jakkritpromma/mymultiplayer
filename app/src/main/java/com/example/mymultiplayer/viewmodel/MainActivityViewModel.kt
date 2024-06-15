@@ -26,7 +26,7 @@ class MainActivityViewModel : ViewModel() {
     fun makeAPICall() {
         val retroInstance = RetroInstance.getRetroInstance()
         val retroService = retroInstance.create(RetroServiceInterface::class.java)
-        val call = retroService.getAllCountryInfo()
+        val call = retroService.getAllCountryFlagLang()
         call.enqueue(object: Callback<JsonArray>{
             override fun onResponse(p0: Call<JsonArray>, p1: Response<JsonArray>) {
                 Log.d(TAG, "response.body: ${p1.body()}")

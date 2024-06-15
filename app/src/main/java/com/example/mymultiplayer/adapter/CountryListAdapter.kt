@@ -40,13 +40,11 @@ class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryL
     class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val flagImage = view.findViewById<ImageView>(R.id.flagImage)
         val tvName = view.findViewById<TextView>(R.id.tvName)
-        val tvCapital = view.findViewById<TextView>(R.id.tvCapital)
-        val tvRegion = view.findViewById<TextView>(R.id.tvRegion)
+        val tvLang = view.findViewById<TextView>(R.id.tvLang)
 
         fun bind(data: CountryModel, activity: Activity) {
-            tvName.text = data.name + "(" + data.alpha2Code + ")"
-            tvCapital.text = "Capital: " + data.capital
-            tvRegion.text = "Region: " + data.region
+            tvName.text = "aa"
+            tvLang.text = "bb"
         }
     }
 

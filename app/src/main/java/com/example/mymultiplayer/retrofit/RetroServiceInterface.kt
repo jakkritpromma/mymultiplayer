@@ -6,9 +6,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface RetroServiceInterface {
-    @GET("v2")
-    fun getCountryList(): Call<List<CountryModel>>
-
-    @GET("all")
-    fun getAllCountryInfo(): Call<JsonArray>
+    @GET("all?fields=name,flags,languages")
+    fun getAllCountryFlagLang(): Call<JsonArray>
 }
