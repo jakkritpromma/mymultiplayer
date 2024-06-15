@@ -1,11 +1,13 @@
 package com.example.mymultiplayer.viewmodel
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mymultiplayer.model.CountryModel
 import com.example.mymultiplayer.retrofit.RetroInstance
 import com.example.mymultiplayer.retrofit.RetroServiceInterface
+import com.example.mymultiplayer.view.MainActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,6 +36,11 @@ class MainActivityViewModel : ViewModel() {
 
             override fun onFailure(p0: Call<List<CountryModel>>, t: Throwable) {
                 Log.d(TAG, "t: ${t.message}")
+                /*MainActivity.context.runOnUiThread(object: Runnable{
+                    override fun run() {
+                        Toast.makeText(MainActivity.context, t.message.toString(), Toast.LENGTH_LONG).show()
+                    }
+                })*/
                 liveDataList.postValue(null)
             }
         })
