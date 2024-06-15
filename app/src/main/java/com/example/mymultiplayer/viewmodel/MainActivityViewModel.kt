@@ -14,7 +14,7 @@ import retrofit2.Response
 
 class MainActivityViewModel : ViewModel() {
     private val TAG = MainActivityViewModel::class.simpleName
-    lateinit var liveDataList: MutableLiveData<List<CountryModel>?>
+    var liveDataList: MutableLiveData<List<CountryModel>?>
 
     init {
         liveDataList = MutableLiveData()

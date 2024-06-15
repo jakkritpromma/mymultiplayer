@@ -1,5 +1,6 @@
 package com.example.mymultiplayer.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Build
@@ -11,23 +12,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.mymultiplayer.R
-import com.example.mymultiplayer.adapter.CountryListAdapter
-import com.example.mymultiplayer.viewmodel.MainActivityViewModel
 
 class MainActivity : AppCompatActivity() {
     companion object {
         val TAG = MainActivity::class.simpleName
-        lateinit var mainActivity: Activity
+        @SuppressLint("StaticFieldLeak") lateinit var mainActivity: Activity
         lateinit var mainFragmentManager: FragmentManager
     }
 
@@ -44,9 +37,7 @@ class MainActivity : AppCompatActivity() {
             setReorderingAllowed(true)
             add<MainFragment>(R.id.fragment_container_view)
         }
-
         onSwipeTouchListener = OnSwipeTouchListener(this, findViewById(R.id.fragment_container_view))
-
     }
 
     private fun hideStatusBar() {
@@ -70,13 +61,13 @@ class MainActivity : AppCompatActivity() {
 
         private val gestureDetector: GestureDetector
         private var context: Context
-        private var menuLeftFragment: MenuLeftFragment? = null
+        private var settingFragment: SettingFragment? = null
 
         init {
             gestureDetector = GestureDetector(context, GestureListener())
             view.setOnTouchListener(this)
             this.context = context
-            menuLeftFragment = MenuLeftFragment()
+            settingFragment = SettingFragment()
         }
 
         override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -123,12 +114,21 @@ class MainActivity : AppCompatActivity() {
 
         internal fun onSwipeRight() {
             Log.d(TAG, "onSwipeRight")
-            mainFragmentManager.beginTransaction().add(R.id.mainConstraintLayout, menuLeftFragment!!).addToBackStack(null).commit()
+            mainFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, // enter
+                R.anim.slide_out, // exit
+                R.anim.fade_in, // popEnter
+                R.anim.slide_out // popExit
+            ).remove(settingFragment!!).commit()
         }
 
         internal fun onSwipeLeft() {
             Log.d(TAG, "onSwipeLeft")
-            mainFragmentManager.beginTransaction().remove(menuLeftFragment!!).commit()
+            mainFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, // enter
+                R.anim.slide_out, // exit
+                R.anim.fade_in, // popEnter
+                R.anim.slide_out // popExit
+            ).replace(R.id.mainConstraintLayout, settingFragment!!).addToBackStack(null).commit()
+
         }
 
         internal fun onSwipeTop() {
@@ -139,6 +139,4 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "onSwipeBottom")
         }
     }
-
-
 }

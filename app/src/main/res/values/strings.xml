@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MyMultiPlayer</string>
+    <string name="media_player">Media Player</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="browser">Browser</string>
+    <string name="languages">Languages</string>
 </resources>
