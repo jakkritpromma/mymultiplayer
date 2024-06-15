@@ -46,16 +46,6 @@ class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryL
         val tvLang = view.findViewById<TextView>(R.id.tvLang)
 
         fun bind(data: CountryModel, activity: Activity) {
-            val mutableSetFlags: MutableSet<String>? = data.flags?.keySet()
-            if(mutableSetFlags != null) {
-                Log.d(TAG, "mutableSetFlags.toList().get(0): " + mutableSetFlags.toList().get(0))
-                val firstKey = mutableSetFlags.toList().get(0)
-                val firstValue = data.flags.get(firstKey).toString()
-                val firstImgLink = firstValue.substring(1, firstValue.length - 1)
-                Log.d(TAG, "firstImgLink: $firstImgLink")
-                Picasso.get().load(firstImgLink).into(flagImage);
-            }
-
             val commonName = data.name?.get("common").toString()
             tvName.text = commonName.substring(1, commonName.length - 1)
 
@@ -67,6 +57,16 @@ class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryL
                 val language = firstValue.substring(1, firstValue.length - 1)
                 Log.d(TAG, "language: $language")
                 tvLang.text = language
+            }
+
+            val mutableSetFlags: MutableSet<String>? = data.flags?.keySet()
+            if(mutableSetFlags != null) {
+                Log.d(TAG, "mutableSetFlags.toList().get(0): " + mutableSetFlags.toList().get(0))
+                val firstKey = mutableSetFlags.toList().get(0)
+                val firstValue = data.flags.get(firstKey).toString()
+                val firstImgLink = firstValue.substring(1, firstValue.length - 1)
+                Log.d(TAG, "firstImgLink: $firstImgLink")
+                Picasso.get().load(firstImgLink).into(flagImage);
             }
         }
     }

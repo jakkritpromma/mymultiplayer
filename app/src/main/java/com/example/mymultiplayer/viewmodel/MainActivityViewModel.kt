@@ -14,17 +14,18 @@ import retrofit2.Response
 
 class MainActivityViewModel : ViewModel() {
     private val TAG = MainActivityViewModel::class.simpleName
-    lateinit var liveDataList: MutableLiveData<List<CountryModel>>
+    lateinit var liveDataList: MutableLiveData<List<CountryModel>?>
 
     init {
         liveDataList = MutableLiveData()
     }
 
-    fun getLiveDataObserver(): MutableLiveData<List<CountryModel>> {
+    fun getLiveDataObserver(): MutableLiveData<List<CountryModel>?> {
         return liveDataList
     }
 
     fun makeAPICall() {
+        Log.d(TAG, "makeAPICall")
         val retroInstance = RetroInstance.getRetroInstance()
         val retroService = retroInstance.create(RetroServiceInterface::class.java)
         val call = retroService.getAllCountryFlagLang()
@@ -36,11 +37,9 @@ class MainActivityViewModel : ViewModel() {
 
             override fun onFailure(p0: Call<List<CountryModel>>, t: Throwable) {
                 Log.d(TAG, "t: ${t.message}")
-                /*MainActivity.context.runOnUiThread(object: Runnable{
-                    override fun run() {
+                /* MainActivity.mainActivity.runOnUiThread(Runnable {
                         Toast.makeText(MainActivity.context, t.message.toString(), Toast.LENGTH_LONG).show()
-                    }
-                })*/
+                    }*/
                 liveDataList.postValue(null)
             }
         })

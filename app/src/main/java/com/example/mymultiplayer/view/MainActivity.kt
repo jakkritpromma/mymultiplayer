@@ -2,13 +2,17 @@ package com.example.mymultiplayer.view
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
@@ -27,13 +31,14 @@ class MainActivity : AppCompatActivity() {
         lateinit var mainFragmentManager: FragmentManager
     }
 
-    lateinit var recyclerAdapter: CountryListAdapter
     var onSwipeTouchListener: OnSwipeTouchListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         mainActivity = this
         setContentView(R.layout.activity_main)
+        hideStatusBar()
         mainFragmentManager = supportFragmentManager
         mainFragmentManager.commit {
             setReorderingAllowed(true)
@@ -41,28 +46,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         onSwipeTouchListener = OnSwipeTouchListener(this, findViewById(R.id.fragment_container_view))
-        //initRecyclerView()
-        //initViewModel()
+
     }
 
-    private fun initRecyclerView() {
-        val countryListRecyclerview = findViewById<RecyclerView>(R.id.countryListRecyclerview)
-        countryListRecyclerview.layoutManager = LinearLayoutManager(this)
-        recyclerAdapter = CountryListAdapter(this)
-        countryListRecyclerview.adapter = recyclerAdapter
+    private fun hideStatusBar() {
+        @Suppress("DEPRECATION") if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
     }
 
-    private fun initViewModel() {
-        val viewModel: MainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
-        viewModel.getLiveDataObserver().observe(this, Observer {
-            if (it != null) {
-                recyclerAdapter.setCountryList(it)
-                recyclerAdapter.notifyDataSetChanged()
-            } else {
-                Toast.makeText(this, "Error in getting list", Toast.LENGTH_SHORT).show()
-            }
-        })
-        viewModel.makeAPICall()
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        hideStatusBar()
+        return super.onTouchEvent(event)
     }
 
     class OnSwipeTouchListener internal constructor(context: Context, view: View) : View.OnTouchListener {
