@@ -13,8 +13,9 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+
 import com.example.mymultiplayer.R
 
 class MainActivity : AppCompatActivity() {
@@ -24,20 +25,21 @@ class MainActivity : AppCompatActivity() {
         lateinit var mainFragmentManager: FragmentManager
     }
 
-    var onSwipeTouchListener: OnSwipeTouchListener? = null
+    private var onSwipeTouchListener: OnSwipeTouchListener? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    @SuppressLint("MissingInflatedId") override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         mainActivity = this
         setContentView(R.layout.activity_main)
         hideStatusBar()
-        mainFragmentManager = supportFragmentManager
-        mainFragmentManager.commit {
-            setReorderingAllowed(true)
-            add<MainFragment>(R.id.fragment_container_view)
-        }
-        onSwipeTouchListener = OnSwipeTouchListener(this, findViewById(R.id.fragment_container_view))
+
+        onSwipeTouchListener = OnSwipeTouchListener(MainActivity.mainActivity, MainActivity.mainActivity.findViewById(R.id.fragment))
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.fragment)
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
     private fun hideStatusBar() {
@@ -82,9 +84,9 @@ class MainActivity : AppCompatActivity() {
             override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 var result = false
                 try {
-                    Log.d(TAG, "e1.x: " + e1!!.x + " e1.y: " + e1.y)
-                    Log.d(TAG, "e2.x: " + e2.x + " e2.y: " + e2.y)
-                    Log.d(TAG, "velocityX: $velocityX + velocityY: $velocityY")
+                    Log.d(MainActivity.TAG, "e1.x: " + e1!!.x + " e1.y: " + e1.y)
+                    Log.d(MainActivity.TAG, "e2.x: " + e2.x + " e2.y: " + e2.y)
+                    Log.d(MainActivity.TAG, "velocityX: $velocityX + velocityY: $velocityY")
                     val diffY = e2.y - e1.y
                     val diffX = e2.x - e1.x
                     if (Math.abs(diffX) > Math.abs(diffY)) {
@@ -106,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Log.e(TAG, "e: $e")
+                    Log.e(MainActivity.TAG, "e: $e")
                 }
                 return result
             }
@@ -114,21 +116,12 @@ class MainActivity : AppCompatActivity() {
 
         internal fun onSwipeRight() {
             Log.d(TAG, "onSwipeRight")
-            mainFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, // enter
-                R.anim.slide_out, // exit
-                R.anim.fade_in, // popEnter
-                R.anim.slide_out // popExit
-            ).remove(settingFragment!!).commit()
+            Navigation.findNavController(mainActivity, R.id.fragment).navigate(R.id.action_settingFragment_to_mainFragment)
         }
 
         internal fun onSwipeLeft() {
             Log.d(TAG, "onSwipeLeft")
-            mainFragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, // enter
-                R.anim.slide_out, // exit
-                R.anim.fade_in, // popEnter
-                R.anim.slide_out // popExit
-            ).replace(R.id.mainConstraintLayout, settingFragment!!).addToBackStack(null).commit()
-
+            Navigation.findNavController(mainActivity, R.id.fragment).navigate(R.id.action_mainFragment_to_settingFragment)
         }
 
         internal fun onSwipeTop() {

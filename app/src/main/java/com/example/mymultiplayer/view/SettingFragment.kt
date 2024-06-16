@@ -9,15 +9,15 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.fragment.app.Fragment
 import com.example.mymultiplayer.R
-import com.example.mymultiplayer.databinding.FragmentSetingBinding
+import com.example.mymultiplayer.databinding.FragmentSettingBinding
 
 class SettingFragment : Fragment() {
     private val TAG = SettingFragment::class.simpleName
-    private var binding: FragmentSetingBinding? = null
+    private var binding: FragmentSettingBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
-        binding = FragmentSetingBinding.inflate(inflater, container, false)
+        binding = FragmentSettingBinding.inflate(inflater, container, false)
         val view = binding!!.root
         return view
     }

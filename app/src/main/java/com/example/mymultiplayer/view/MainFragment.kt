@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.mymultiplayer.databinding.FragmentMainBinding
 
+
 class MainFragment : Fragment() {
     private val TAG = MainFragment::class.simpleName
     private var binding: FragmentMainBinding? = null
@@ -23,9 +24,9 @@ class MainFragment : Fragment() {
         Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.tvMediaPlayer?.setOnClickListener {  }
-        binding?.tvBluetooth?.setOnClickListener {  }
-        binding?.tvBrowser?.setOnClickListener {  }
+        binding?.tvMediaPlayer?.setOnClickListener { }
+        binding?.tvBluetooth?.setOnClickListener { }
+        binding?.tvBrowser?.setOnClickListener { }
     }
 
     override fun onDestroyView() {
@@ -33,5 +34,4 @@ class MainFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
-
 }
