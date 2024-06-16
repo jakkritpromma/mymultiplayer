@@ -17,8 +17,7 @@ class SettingFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
         binding = FragmentSettingBinding.inflate(inflater, container, false)
-        val view = binding!!.root
-        return view
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

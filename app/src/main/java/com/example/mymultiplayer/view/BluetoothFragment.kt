@@ -3,7 +3,6 @@ package com.example.mymultiplayer.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
-import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -15,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,7 +48,7 @@ class BluetoothFragment : Fragment() {
         }
 
         binding!!.tvRefresh.setOnClickListener {
-
+            btScan()
         }
         return view
     }
@@ -65,13 +63,7 @@ class BluetoothFragment : Fragment() {
         Log.d(TAG, "btScan")
         val bluetoothManager: BluetoothManager = MainActivity.mainActivity.getSystemService(BluetoothManager::class.java)
         val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
-        val builder = AlertDialog.Builder(MainActivity.mainActivity)
-        val inflater = layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.scan_bt, null)
-        builder.setCancelable(false)
-        builder.setView(dialogView)
-        val listView = dialogView.findViewById<ListView>(R.id.bt_lst)
-        val dialog = builder.create()
+        val listView = binding?.selectDeviceList
         val pairedDevices: Set<BluetoothDevice> = bluetoothAdapter?.bondedDevices as Set<BluetoothDevice>
         val simpleAdapter: SimpleAdapter
         var data: MutableList<Map<String?, Any?>?>? = null
@@ -80,31 +72,49 @@ class BluetoothFragment : Fragment() {
             val dataNum1: MutableMap<String?, Any?> = HashMap()
             dataNum1["A"] = ""
             dataNum1["B"] = ""
+            dataNum1["C"] = ""
             data.add(dataNum1)
             for (device in pairedDevices) {
                 val datanum: MutableMap<String?, Any?> = HashMap()
                 datanum["A"] = device.name
                 datanum["B"] = device.address
+                datanum["C"] = device.name + " " + device.address
                 data.add(datanum)
             }
-            val fromWhere = arrayOf("A")
-            val viewswhere = intArrayOf(R.id.item_name)
-            simpleAdapter = SimpleAdapter(MainActivity.mainActivity, data, R.layout.item_list, fromWhere, viewswhere)
-            listView.adapter = simpleAdapter
+            val fromWhere = arrayOf("C")
+            val itemName = intArrayOf(R.id.item_name)
+            simpleAdapter = SimpleAdapter(MainActivity.mainActivity, data, R.layout.item_list, fromWhere, itemName)
+            listView!!.adapter = simpleAdapter
             simpleAdapter.notifyDataSetChanged()
-            listView.onItemClickListener = AdapterView.OnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
-                val string = simpleAdapter.getItem(position) as HashMap<String, String>
+            listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                val string = simpleAdapter.getItem(position) as HashMap<*, *>
                 val name = string["A"]
-                val address = string["B"]
+                val m_address = string["B"]
                 Log.d(TAG, "name: $name")
-                Log.d(TAG, "address: $address")
-                dialog.dismiss()
+                Log.d(TAG, "address: $m_address")
+
+                /*var m_myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+                var m_bluetoothSocket: BluetoothSocket? = null
+                lateinit var m_bluetoothAdapter: BluetoothAdapter
+                var m_isConnected: Boolean = false
+
+                try {
+                    if (m_bluetoothSocket == null || !m_isConnected) {
+                        m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+                        val device: BluetoothDevice = m_bluetoothAdapter.getRemoteDevice(m_address)
+                        m_bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(m_myUUID)
+                        BluetoothAdapter.getDefaultAdapter().cancelDiscovery()
+                        m_bluetoothSocket!!.connect()
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    Log.e(TAG,"e: $e")
+                }*/
             }
         } else {
             Toast.makeText(MainActivity.mainActivity, "No device found", Toast.LENGTH_LONG).show()
             return
         }
-        dialog.show()
     }
 
     private fun requestBluetooth() { // check android 12+
