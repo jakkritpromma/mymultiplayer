@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.mymultiplayer.view.MainFragment"
-        tools:layout="@layout/fragment_main" >
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_settingFragment"
             app:destination="@id/settingFragment"
@@ -16,10 +16,16 @@
             app:exitAnim="@anim/slide_out_to_left"
             app:popEnterAnim="@anim/slide_in_from_left"
             app:popExitAnim="@anim/slide_out_to_right" />
-
         <action
             android:id="@+id/action_mainFragment_to_bluetoothFragment"
             app:destination="@+id/bluetoothFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_mainFragment_to_webFragment"
+            app:destination="@id/webFragment"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -29,15 +35,15 @@
     <fragment
         android:id="@+id/settingFragment"
         android:name="com.example.mymultiplayer.view.SettingFragment"
-        tools:layout="@layout/fragment_setting" >
+        tools:layout="@layout/fragment_setting">
         <action
             android:id="@+id/action_settingFragment_to_mainFragment"
-            app:popUpTo="@+id/my_nav"
             app:destination="@id/mainFragment"
             app:enterAnim="@anim/slide_in_from_left"
             app:exitAnim="@anim/slide_out_to_right"
             app:popEnterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/slide_out_to_right" />
+            app:popExitAnim="@anim/slide_out_to_right"
+            app:popUpTo="@+id/my_nav" />
         <action
             android:id="@+id/action_settingFragment_to_languagesFragment"
 
@@ -51,15 +57,15 @@
     <fragment
         android:id="@+id/languagesFragment"
         android:name="com.example.mymultiplayer.view.LanguagesFragment"
-        tools:layout="@layout/fragment_languages" >
+        tools:layout="@layout/fragment_languages">
         <action
             android:id="@+id/action_langaugesFragment_to_settingFragment"
-            app:popUpTo="@id/mainFragment"
             app:destination="@+id/settingFragment"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/slide_out_to_right" />
+            app:popExitAnim="@anim/slide_out_to_right"
+            app:popUpTo="@id/mainFragment" />
     </fragment>
 
     <fragment
@@ -68,12 +74,26 @@
         tools:layout="@layout/fragment_bluetooth">
         <action
             android:id="@+id/action_bluetoothFragment_to_mainFragment"
-            app:popUpTo="@+id/my_nav"
             app:destination="@+id/mainFragment"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/slide_out_to_right" />
+            app:popExitAnim="@anim/slide_out_to_right"
+            app:popUpTo="@+id/my_nav" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/webFragment"
+        android:name="com.example.mymultiplayer.view.WebFragment"
+        tools:layout="@layout/fragment_web">
+        <action
+            android:id="@+id/action_webFragment_to_mainFragment"
+            app:destination="@+id/mainFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/slide_out_to_right"
+            app:popUpTo="@+id/my_nav" />
     </fragment>
 
 </navigation>

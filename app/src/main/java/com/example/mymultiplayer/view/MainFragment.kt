@@ -29,7 +29,9 @@ class MainFragment : Fragment() {
         binding?.tvBluetooth?.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_bluetoothFragment)
         }
-        binding?.tvBrowser?.setOnClickListener { }
+        binding?.tvBrowser?.setOnClickListener {
+            findNavController().navigate(R.id.action_mainFragment_to_webFragment)
+        }
     }
 
     override fun onDestroyView() {
