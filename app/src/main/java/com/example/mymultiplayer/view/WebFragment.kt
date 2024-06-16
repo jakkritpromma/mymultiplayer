@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.databinding.FragmentWebBinding
 
-class WebFragment: Fragment() {
+class WebFragment : Fragment() {
     private val TAG = WebFragment::class.simpleName
     private var binding: FragmentWebBinding? = null
 
@@ -23,11 +24,20 @@ class WebFragment: Fragment() {
         binding?.tvBackWeb?.setOnClickListener {
             findNavController().navigate(R.id.action_webFragment_to_mainFragment)
         }
-        
+
         binding?.webView?.webViewClient = WebViewClient()
         binding?.webView?.loadUrl("https://www.google.com/")
         binding?.webView?.settings?.javaScriptEnabled = true
         binding?.webView?.settings?.setSupportZoom(true)
+
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                Log.d(TAG, "handleOnBackPressed")
+                if (binding?.webView?.canGoBack() == true) {
+                    binding?.webView?.goBack()
+                }
+            }
+        })
 
         return view
     }

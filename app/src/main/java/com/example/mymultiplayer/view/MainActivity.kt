@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
+
     class OnSwipeTouchListener internal constructor(context: Context, view: View) : View.OnTouchListener {
         private companion object {
             private const val swipeThreshold = 100
@@ -64,13 +65,11 @@ class MainActivity : AppCompatActivity() {
 
         private val gestureDetector: GestureDetector
         private var context: Context
-        private var settingFragment: SettingFragment? = null
 
         init {
             gestureDetector = GestureDetector(context, GestureListener())
             view.setOnTouchListener(this)
             this.context = context
-            settingFragment = SettingFragment()
         }
 
         override fun onTouch(v: View, event: MotionEvent): Boolean {
