@@ -8,7 +8,6 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.mymultiplayer.view.MainFragment"
-        android:label="Home"
         tools:layout="@layout/fragment_main" >
         <action
             android:id="@+id/action_mainFragment_to_settingFragment"
@@ -18,16 +17,39 @@
             app:popEnterAnim="@anim/slide_in_from_left"
             app:popExitAnim="@anim/slide_out_to_right" />
     </fragment>
+
     <fragment
         android:id="@+id/settingFragment"
         android:name="com.example.mymultiplayer.view.SettingFragment"
-        android:label="Setting Fragment"
         tools:layout="@layout/fragment_setting" >
         <action
             android:id="@+id/action_settingFragment_to_mainFragment"
+            app:popUpTo="@+id/my_nav"
             app:destination="@id/mainFragment"
             app:enterAnim="@anim/slide_in_from_left"
             app:exitAnim="@anim/slide_out_to_right"
+            app:popEnterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/slide_out_to_right" />
+        <action
+            android:id="@+id/action_settingFragment_to_languagesFragment"
+
+            app:destination="@+id/languagesFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/languagesFragment"
+        android:name="com.example.mymultiplayer.view.LanguagesFragment"
+        tools:layout="@layout/fragment_languages" >
+        <action
+            android:id="@+id/action_langaugesFragment_to_settingFragment"
+            app:popUpTo="@id/mainFragment"
+            app:destination="@+id/settingFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in_from_left"
             app:popExitAnim="@anim/slide_out_to_right" />
     </fragment>

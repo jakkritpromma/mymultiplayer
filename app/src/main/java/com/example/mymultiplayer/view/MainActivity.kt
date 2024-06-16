@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         mainActivity = this
         setContentView(R.layout.activity_main)
         hideStatusBar()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         onSwipeTouchListener = OnSwipeTouchListener(MainActivity.mainActivity, MainActivity.mainActivity.findViewById(R.id.fragment))
     }

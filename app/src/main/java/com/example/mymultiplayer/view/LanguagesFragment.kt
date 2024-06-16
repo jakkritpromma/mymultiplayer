@@ -10,8 +10,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.adapter.CountryListAdapter
 import com.example.mymultiplayer.databinding.FragmentLanguagesBinding
@@ -27,10 +27,10 @@ class LanguagesFragment : Fragment() {
         binding = FragmentLanguagesBinding.inflate(inflater, container, false)
         val view = binding?.root
 
-        val countryListRecyclerview = view?.findViewById<RecyclerView>(R.id.countryListRecyclerview)
-        countryListRecyclerview?.layoutManager = LinearLayoutManager(MainActivity.mainActivity)
+        binding?.countryListRecyclerview
+        binding?.countryListRecyclerview?.layoutManager = LinearLayoutManager(MainActivity.mainActivity)
         recyclerAdapter = CountryListAdapter(MainActivity.mainActivity)
-        countryListRecyclerview?.adapter = recyclerAdapter
+        binding?.countryListRecyclerview?.adapter = recyclerAdapter
 
         val viewModel: MainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         viewModel.getLiveDataObserver().observe(viewLifecycleOwner, Observer {
@@ -44,6 +44,11 @@ class LanguagesFragment : Fragment() {
             }
         })
         viewModel.makeAPICall()
+
+        binding?.btnBackFromLanguages?.setOnClickListener {
+            findNavController().navigate(R.id.action_langaugesFragment_to_settingFragment)
+        }
+
         return view
     }
 
