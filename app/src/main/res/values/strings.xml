@@ -5,4 +5,5 @@
     <string name="browser">Browser</string>
     <string name="languages">Languages</string>
     <string name="back">Back</string>
+    <string name="refresh">Refresh</string>
 </resources>

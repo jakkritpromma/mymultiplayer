@@ -50,9 +50,6 @@ class MainActivityViewModel : ViewModel() {
 
             override fun onFailure(p0: Call<List<CountryModel>>, t: Throwable) {
                 Log.d(TAG, "t: ${t.message}")
-                /* MainActivity.mainActivity.runOnUiThread(Runnable {
-                        Toast.makeText(MainActivity.context, t.message.toString(), Toast.LENGTH_LONG).show()
-                    }*/
                 liveDataList.postValue(null)
                 progressDialog.dismiss()
             }

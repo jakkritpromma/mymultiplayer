@@ -45,7 +45,7 @@ class LanguagesFragment : Fragment() {
         })
         viewModel.makeAPICall()
 
-        binding?.btnBackFromLanguages?.setOnClickListener {
+        binding?.tvBackFromLanguages?.setOnClickListener {
             findNavController().navigate(R.id.action_langaugesFragment_to_settingFragment)
         }
 
