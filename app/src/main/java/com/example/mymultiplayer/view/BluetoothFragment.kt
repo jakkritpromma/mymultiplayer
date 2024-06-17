@@ -6,8 +6,12 @@ import android.app.Activity.RESULT_OK
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothSocket
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,10 +21,19 @@ import android.widget.AdapterView
 import android.widget.SimpleAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.databinding.FragmentBluetoothBinding
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.util.UUID
+
 
 class BluetoothFragment : Fragment() {
     private val TAG = BluetoothFragment::class.simpleName
@@ -42,7 +55,8 @@ class BluetoothFragment : Fragment() {
         }
         Log.d(TAG, "!m_bluetoothAdapter!!.isEnabled: " + !m_bluetoothAdapter!!.isEnabled)
         if (!m_bluetoothAdapter!!.isEnabled) {
-            requestBluetooth()
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            requestEnableBluetooth.launch(enableBtIntent)
         } else {
             btScan()
         }
@@ -59,7 +73,67 @@ class BluetoothFragment : Fragment() {
         binding = null
     }
 
-    @SuppressLint("MissingPermission") private fun btScan() {
+    fun btScan() {
+        var btAdapter = BluetoothAdapter.getDefaultAdapter()
+        if (btAdapter == null) {
+            Log.d(TAG, "No Bt Adapter!")
+        } else if (!btAdapter.isEnabled) {
+            Log.d(TAG, "Bt Adapter is NOT ENABLED!")
+        } else {
+            Log.d(TAG, "Bt Adapter is ENABLED!")
+            var data: MutableList<Map<String?, Any?>?>? = ArrayList()
+            val receiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    when (intent.action) {
+                        BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
+                            Log.d(TAG, "Device discovery started")
+                        }
+                        BluetoothDevice.ACTION_FOUND -> {
+                            Log.d(TAG, "found")
+                            val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+
+                            if (ActivityCompat.checkSelfPermission(MainActivity.mainActivity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) { // TODO: Consider calling
+                                return
+                            } else {
+                                val deviceName = device?.name
+                                val address = device?.address // MAC address
+                                Log.d(TAG, "deviceName: $deviceName address: $address")
+                                val dataNum: MutableMap<String?, Any?> = HashMap()
+                                dataNum["A"] = deviceName
+                                dataNum["B"] = address
+                                dataNum["C"] = deviceName + " " + address
+                                data?.add(dataNum)
+                            }
+                        }
+                        BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
+                            Log.d(TAG, "Device discovery finished")
+                            val fromWhere = arrayOf("C")
+                            val listView = binding?.selectDeviceList
+                            val itemName = intArrayOf(R.id.item_name)
+                            val simpleAdapter = SimpleAdapter(MainActivity.mainActivity, data, R.layout.item_list, fromWhere, itemName)
+                            listView!!.adapter = simpleAdapter
+                            simpleAdapter.notifyDataSetChanged()
+                            listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                                //TODO connect
+                            }
+                        }
+                    }
+                }
+            } // Register for broadcasts when a device is discovered.
+            val intentFilter = IntentFilter().apply {
+                addAction(BluetoothDevice.ACTION_FOUND)
+                addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
+                addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+            }
+            if (btAdapter.isDiscovering()) {
+                btAdapter.cancelDiscovery();
+            }
+            MainActivity.mainActivity.registerReceiver(receiver, intentFilter)
+            btAdapter.startDiscovery()
+        }
+    }
+
+    @SuppressLint("MissingPermission") private fun pairedBtScan() {
         Log.d(TAG, "btScan")
         val bluetoothManager: BluetoothManager = MainActivity.mainActivity.getSystemService(BluetoothManager::class.java)
         val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
@@ -87,29 +161,7 @@ class BluetoothFragment : Fragment() {
             listView!!.adapter = simpleAdapter
             simpleAdapter.notifyDataSetChanged()
             listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                val string = simpleAdapter.getItem(position) as HashMap<*, *>
-                val name = string["A"]
-                val m_address = string["B"]
-                Log.d(TAG, "name: $name")
-                Log.d(TAG, "address: $m_address")
-
-                /*var m_myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-                var m_bluetoothSocket: BluetoothSocket? = null
-                lateinit var m_bluetoothAdapter: BluetoothAdapter
-                var m_isConnected: Boolean = false
-
-                try {
-                    if (m_bluetoothSocket == null || !m_isConnected) {
-                        m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-                        val device: BluetoothDevice = m_bluetoothAdapter.getRemoteDevice(m_address)
-                        m_bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(m_myUUID)
-                        BluetoothAdapter.getDefaultAdapter().cancelDiscovery()
-                        m_bluetoothSocket!!.connect()
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    Log.e(TAG,"e: $e")
-                }*/
+                //TODO connect paired
             }
         } else {
             Toast.makeText(MainActivity.mainActivity, "No device found", Toast.LENGTH_LONG).show()
@@ -117,29 +169,10 @@ class BluetoothFragment : Fragment() {
         }
     }
 
-    private fun requestBluetooth() { // check android 12+
-        Log.d(TAG, "requestBluetooth")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            requestMultiplePermissions.launch(arrayOf(
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-            ))
-        } else {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            requestEnableBluetooth.launch(enableBtIntent)
-        }
-    }
-
     private val requestEnableBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) { // granted
             btScan()
         } else { // denied
-        }
-    }
-
-    private val requestMultiplePermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        permissions.entries.forEach {
-            Log.d("MyTag", "${it.key} = ${it.value}")
         }
     }
 }

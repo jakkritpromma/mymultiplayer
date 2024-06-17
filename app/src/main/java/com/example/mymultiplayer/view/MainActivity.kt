@@ -1,8 +1,10 @@
 package com.example.mymultiplayer.view
 
+import android.Manifest.permission
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -13,34 +15,28 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.viewmodel.TimeViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.apache.commons.net.ntp.NTPUDPClient
-import org.apache.commons.net.ntp.TimeInfo
-import java.net.InetAddress
-import java.text.SimpleDateFormat
-import java.util.Date
+
 
 class MainActivity : AppCompatActivity() {
     companion object {
         val TAG = MainActivity::class.simpleName
-        @SuppressLint("StaticFieldLeak")
-        lateinit var mainActivity: Activity
+
+        @SuppressLint("StaticFieldLeak") lateinit var mainActivity: Activity
     }
 
     private var onSwipeTouchListener: OnSwipeTouchListener? = null
     private var tvUpdatedTime: TextView? = null
 
-    @SuppressLint("MissingInflatedId")
-    override fun onCreate(savedInstanceState: Bundle?) {
+    @SuppressLint("MissingInflatedId") override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         mainActivity = this
@@ -48,11 +44,16 @@ class MainActivity : AppCompatActivity() {
         hideStatusBar()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        val PERMISSIONS = arrayOf<String>(permission.BLUETOOTH_SCAN, permission.BLUETOOTH_CONNECT, permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION)
+        if (!hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, 1)
+        }
+
         onSwipeTouchListener = OnSwipeTouchListener(MainActivity.mainActivity, MainActivity.mainActivity.findViewById(R.id.fragment))
         tvUpdatedTime = findViewById(R.id.tvUpdatedTime)
 
         val viewModel: TimeViewModel = ViewModelProvider(this).get(TimeViewModel::class.java)
-        viewModel.liveData.observe(this){
+        viewModel.liveData.observe(this) {
             it?.let { tvUpdatedTime!!.setText(it.time) }
         }
         lifecycle.coroutineScope.launch {
@@ -62,6 +63,18 @@ class MainActivity : AppCompatActivity() {
                 delay(1000L)
             }
         }
+    }
+
+    fun hasPermissions(context: Context?, vararg permissions: Array<String>): Boolean {
+        if (context != null && permissions != null) {
+            for (permission in permissions) {
+                Log.d(TAG, "permission: $permission " + ActivityCompat.checkSelfPermission(context, permission!!.toString()))
+                if (ActivityCompat.checkSelfPermission(context, permission!!.toString()) != PackageManager.PERMISSION_GRANTED) {
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     override fun onSupportNavigateUp(): Boolean {
