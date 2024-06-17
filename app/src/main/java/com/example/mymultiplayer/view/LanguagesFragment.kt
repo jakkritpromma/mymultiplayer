@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.adapter.CountryListAdapter
 import com.example.mymultiplayer.databinding.FragmentLanguagesBinding
-import com.example.mymultiplayer.viewmodel.MainActivityViewModel
+import com.example.mymultiplayer.viewmodel.LanguagesViewModel
 
 class LanguagesFragment : Fragment() {
     private val TAG = LanguagesFragment::class.simpleName
@@ -32,7 +32,7 @@ class LanguagesFragment : Fragment() {
         recyclerAdapter = CountryListAdapter(MainActivity.mainActivity)
         binding?.countryListRecyclerview?.adapter = recyclerAdapter
 
-        val viewModel: MainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+        val viewModel: LanguagesViewModel = ViewModelProvider(this).get(LanguagesViewModel::class.java)
         viewModel.getLiveDataObserver().observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 recyclerAdapter.setCountryList(it)
