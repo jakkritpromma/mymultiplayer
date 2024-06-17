@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mymultiplayer.R
-import com.example.mymultiplayer.model.CountryModel
+import com.example.mymultiplayer.model.LanguageModel
 import com.squareup.picasso.Picasso
 
 
@@ -19,9 +19,9 @@ class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryL
         private val TAG = CountryListAdapter::class.simpleName
     }
 
-    private var countryList: List<CountryModel>? = null
+    private var countryList: List<LanguageModel>? = null
 
-    fun setCountryList(countryList: List<CountryModel>?) {
+    fun setCountryList(countryList: List<LanguageModel>?) {
         this.countryList = countryList
     }
 
@@ -45,7 +45,7 @@ class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryL
         val tvName = view.findViewById<TextView>(R.id.tvName)
         val tvLang = view.findViewById<TextView>(R.id.tvLang)
 
-        fun bind(data: CountryModel, activity: Activity) {
+        fun bind(data: LanguageModel, activity: Activity) {
             val commonName = data.name?.get("common").toString()
             tvName.text = commonName.substring(1, commonName.length - 1)
 

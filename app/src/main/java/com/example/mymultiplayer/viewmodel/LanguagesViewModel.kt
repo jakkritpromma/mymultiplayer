@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mymultiplayer.R
-import com.example.mymultiplayer.model.CountryModel
+import com.example.mymultiplayer.model.LanguageModel
 import com.example.mymultiplayer.retrofit.RetroInstance
 import com.example.mymultiplayer.retrofit.RetroServiceInterface
 import com.example.mymultiplayer.view.MainActivity
@@ -18,9 +18,9 @@ import retrofit2.Response
 
 class LanguagesViewModel : ViewModel() {
     private val TAG = LanguagesViewModel::class.simpleName
-    var liveDataList: MutableLiveData<List<CountryModel>?> = MutableLiveData()
+    var liveDataList: MutableLiveData<List<LanguageModel>?> = MutableLiveData()
 
-    fun getLiveDataObserver(): MutableLiveData<List<CountryModel>?> {
+    fun getLiveDataObserver(): MutableLiveData<List<LanguageModel>?> {
         return liveDataList
     }
 
@@ -36,14 +36,14 @@ class LanguagesViewModel : ViewModel() {
         val retroInstance = RetroInstance.getRetroInstance()
         val retroService = retroInstance.create(RetroServiceInterface::class.java)
         val call = retroService.getAllCountryFlagLang()
-        call.enqueue(object: Callback<List<CountryModel>>{
-            override fun onResponse(p0: Call<List<CountryModel>>, response: Response<List<CountryModel>>) {
+        call.enqueue(object: Callback<List<LanguageModel>>{
+            override fun onResponse(p0: Call<List<LanguageModel>>, response: Response<List<LanguageModel>>) {
                 Log.d(TAG, "response.body: ${response.body()}")
                 liveDataList.postValue(response.body())
                 progressDialog.dismiss()
             }
 
-            override fun onFailure(p0: Call<List<CountryModel>>, t: Throwable) {
+            override fun onFailure(p0: Call<List<LanguageModel>>, t: Throwable) {
                 Log.d(TAG, "t: ${t.message}")
                 liveDataList.postValue(null)
                 progressDialog.dismiss()

@@ -3,6 +3,9 @@ package com.example.mymultiplayer.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
+import android.app.Dialog
+import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -12,27 +15,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.SimpleAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.databinding.FragmentBluetoothBinding
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.IOException
-import java.util.UUID
 
 
 class BluetoothFragment : Fragment() {
@@ -74,13 +73,20 @@ class BluetoothFragment : Fragment() {
     }
 
     fun btScan() {
-        var btAdapter = BluetoothAdapter.getDefaultAdapter()
+        val bluetoothManager = context?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val btAdapter = bluetoothManager.adapter
         if (btAdapter == null) {
             Log.d(TAG, "No Bt Adapter!")
         } else if (!btAdapter.isEnabled) {
             Log.d(TAG, "Bt Adapter is NOT ENABLED!")
         } else {
             Log.d(TAG, "Bt Adapter is ENABLED!")
+            val builder = AlertDialog.Builder(MainActivity.mainActivity)
+            builder.setView(R.layout.progress_layout)
+            val progressDialog = builder.create()
+            progressDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            progressDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            progressDialog.show()
             var data: MutableList<Map<String?, Any?>?>? = ArrayList()
             val receiver = object : BroadcastReceiver() {
                 override fun onReceive(context: Context, intent: Intent) {
@@ -116,6 +122,7 @@ class BluetoothFragment : Fragment() {
                             listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                                 //TODO connect
                             }
+                            progressDialog.dismiss()
                         }
                     }
                 }

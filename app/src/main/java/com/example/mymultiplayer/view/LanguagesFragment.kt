@@ -27,7 +27,6 @@ class LanguagesFragment : Fragment() {
         binding = FragmentLanguagesBinding.inflate(inflater, container, false)
         val view = binding?.root
 
-        binding?.countryListRecyclerview
         binding?.countryListRecyclerview?.layoutManager = LinearLayoutManager(MainActivity.mainActivity)
         recyclerAdapter = CountryListAdapter(MainActivity.mainActivity)
         binding?.countryListRecyclerview?.adapter = recyclerAdapter
