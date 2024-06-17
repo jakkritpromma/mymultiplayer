@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mymultiplayer.R
@@ -17,13 +16,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainActivityViewModel : ViewModel() {
-    private val TAG = MainActivityViewModel::class.simpleName
-    var liveDataList: MutableLiveData<List<CountryModel>?>
-
-    init {
-        liveDataList = MutableLiveData()
-    }
+class LanguagesViewModel : ViewModel() {
+    private val TAG = LanguagesViewModel::class.simpleName
+    var liveDataList: MutableLiveData<List<CountryModel>?> = MutableLiveData()
 
     fun getLiveDataObserver(): MutableLiveData<List<CountryModel>?> {
         return liveDataList

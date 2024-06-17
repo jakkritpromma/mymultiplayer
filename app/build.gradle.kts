@@ -57,5 +57,9 @@ dependencies {
     // Navigation Component
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    implementation("commons-net:commons-net:3.3")
+
+    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0-rc03")
 }
 
