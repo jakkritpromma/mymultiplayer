@@ -10,6 +10,7 @@
         android:layout_height="0dp"
         android:layout_weight="8"
         android:id="@+id/playerView"
+        android:visibility="invisible"
         app:use_controller="false"
         app:shutter_background_color="@android:color/transparent"/>
     <LinearLayout
@@ -49,19 +50,19 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:text="Play"
+            android:text="PLAY"
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:background="@drawable/main_button_selector"
-            android:layout_marginRight="10dp"></TextView>
+            android:layout_marginRight="10dp" />
 
         <TextView
             android:id="@+id/tvPause"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:text="Pause"
+            android:text="PAUSE"
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="22sp"

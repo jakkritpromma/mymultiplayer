@@ -1,7 +1,9 @@
 package com.example.mymultiplayer.view
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +14,7 @@ import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_READY
 import androidx.media3.common.util.UnstableApi
@@ -24,6 +27,13 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.example.mymultiplayer.databinding.FragmentPlayerBinding
 import com.example.mymultiplayer.model.Video
 import com.example.mymultiplayer.model.getAllVideos
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import java.lang.Thread.sleep
+import java.util.Timer
+import java.util.TimerTask
 
 class PlayerFragment : Fragment() {
     private val TAG = PlayerFragment::class.simpleName
@@ -119,13 +129,30 @@ class PlayerFragment : Fragment() {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             when (playbackState) {
-                STATE_ENDED -> restartPlayer()
+                STATE_ENDED -> {
+                    Log.d(TAG, "STATE_ENDED")
+                    restartPlayer()
+                }
                 STATE_READY -> {
                     Log.d(TAG, "STATE_READY onPlaybackStateChanged playWhenReady: " + player?.playWhenReady)
                     if(player?.playWhenReady == true) {
                         binding?.playerView?.player = player
-                        play() //onResume
+                        Timer().schedule(object : TimerTask() { //set timer to prevent pre-initializing portrait vdo
+                            override fun run() {
+                                requireActivity().runOnUiThread{
+                                    play() //onPlaybackStateChanged
+                                    binding?.playerView?.visibility = VISIBLE
+                                }
+                            }
+                        }, 100)
+
                     }
+                }
+                STATE_BUFFERING -> {
+                    Log.d(TAG, "STATE_BUFFERING")
+                }
+                Player.STATE_IDLE -> {
+                    Log.d(TAG, "STATE_IDLE")
                 }
             }
         }
