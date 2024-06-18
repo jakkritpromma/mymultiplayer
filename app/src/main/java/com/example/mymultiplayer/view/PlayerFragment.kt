@@ -1,9 +1,7 @@
 package com.example.mymultiplayer.view
 
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -27,11 +25,6 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.example.mymultiplayer.databinding.FragmentPlayerBinding
 import com.example.mymultiplayer.model.Video
 import com.example.mymultiplayer.model.getAllVideos
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import java.lang.Thread.sleep
 import java.util.Timer
 import java.util.TimerTask
 
@@ -64,6 +57,26 @@ class PlayerFragment : Fragment() {
         binding?.tvPause?.setOnClickListener {
             pause()
         }
+        binding?.tvNext?.setOnClickListener {
+            indexVDO++
+            if(indexVDO >= videoList.size){
+                indexVDO--
+            }
+            Log.d(TAG, "indexVDO: " + indexVDO)
+            val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
+            player?.setMediaItem(mediaItem)
+            player?.prepare()
+        }
+        binding?.tvPrev?.setOnClickListener {
+            indexVDO--
+            if(indexVDO < 0){
+                indexVDO = 0
+            }
+            Log.d(TAG, "indexVDO: " + indexVDO)
+            val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
+            player?.setMediaItem(mediaItem)
+            player?.prepare()
+        }
 
         return view
     }
@@ -79,9 +92,15 @@ class PlayerFragment : Fragment() {
         play() //onResume
     }
 
+    override fun onStop() {
+        super.onStop()
+        binding?.playerView?.visibility = INVISIBLE
+        releasePlayer()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        releasePlayer()
+        binding = null
     }
 
     @OptIn(UnstableApi::class)
