@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
@@ -20,21 +22,42 @@ import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.example.mymultiplayer.databinding.FragmentPlayerBinding
+import com.example.mymultiplayer.model.Video
+import com.example.mymultiplayer.model.getAllVideos
 
 class PlayerFragment : Fragment() {
     private val TAG = PlayerFragment::class.simpleName
     private var binding: FragmentPlayerBinding? = null
     private val mediaUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
-    private var player: ExoPlayer?= null
+    private var player: ExoPlayer? = null
     private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+    private lateinit var videoList: ArrayList<Video>
+    private var indexVDO = 0;
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
         binding = FragmentPlayerBinding.inflate(inflater, container, false)
         val view = binding?.root
+
+        videoList = getAllVideos(requireActivity())
+        Log.d(TAG, "videoList.size: " + videoList.size)
+
         initPlayer()
+        binding?.tvStop?.setOnClickListener {
+            player?.playWhenReady = false;
+            player?.seekTo(0)
+            indexVDO = 0;
+        }
+        binding?.tvPlay?.setOnClickListener {
+            play() //tvPlay
+        }
+        binding?.tvPause?.setOnClickListener {
+            pause()
+        }
+
         return view
     }
+
     override fun onPause() {
         super.onPause()
         pause()
@@ -42,7 +65,8 @@ class PlayerFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        play()
+        Log.d(TAG, "play onResume")
+        play() //onResume
     }
 
     override fun onDestroy() {
@@ -51,15 +75,10 @@ class PlayerFragment : Fragment() {
     }
 
     @OptIn(UnstableApi::class)
-    private fun initPlayer(){
-        player = ExoPlayer.Builder(requireActivity())
-                .build()
-                .apply {
-                    val source = if (mediaUrl.contains("m3u8"))
-                        getHlsMediaSource()
-                    else
-                        getProgressiveMediaSource()
-                    setMediaSource(source)
+    private fun initPlayer() {
+        player = ExoPlayer.Builder(requireActivity()).build().apply {
+                    val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
+                    setMediaItem(mediaItem)
                     prepare()
                     addListener(playerListener)
                 }
@@ -67,17 +86,15 @@ class PlayerFragment : Fragment() {
 
     @OptIn(UnstableApi::class)
     private fun getHlsMediaSource(): MediaSource {
-        return HlsMediaSource.Factory(dataSourceFactory).
-        createMediaSource(MediaItem.fromUri(mediaUrl))
+        return HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(mediaUrl))
     }
 
     @OptIn(UnstableApi::class)
-    private fun getProgressiveMediaSource(): MediaSource{
-        return ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(Uri.parse(mediaUrl)))
+    private fun getProgressiveMediaSource(): MediaSource {
+        return ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(Uri.parse(mediaUrl)))
     }
 
-    private fun releasePlayer(){
+    private fun releasePlayer() {
         player?.apply {
             playWhenReady = false
             release()
@@ -85,27 +102,30 @@ class PlayerFragment : Fragment() {
         player = null
     }
 
-    private fun pause(){
+    private fun pause() {
         player?.playWhenReady = false
     }
 
-    private fun play(){
+    private fun play() {
         player?.playWhenReady = true
     }
 
-    private fun restartPlayer(){
+    private fun restartPlayer() {
         player?.seekTo(0)
         player?.playWhenReady = true
     }
 
-    private val playerListener = object: Player.Listener {
+    private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
-            when(playbackState){
+            when (playbackState) {
                 STATE_ENDED -> restartPlayer()
                 STATE_READY -> {
-                    binding?.playerView?.player = player
-                    play()
+                    Log.d(TAG, "STATE_READY onPlaybackStateChanged playWhenReady: " + player?.playWhenReady)
+                    if(player?.playWhenReady == true) {
+                        binding?.playerView?.player = player
+                        play() //onResume
+                    }
                 }
             }
         }

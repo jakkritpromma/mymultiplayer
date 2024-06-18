@@ -1,6 +1,7 @@
 package com.example.mymultiplayer.view
 
 import android.Manifest.permission
+import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -21,7 +22,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.mymultiplayer.R
-import com.example.mymultiplayer.databinding.ActivityMainBinding
 import com.example.mymultiplayer.viewmodel.TimeViewModel
 import kotlinx.coroutines.launch
 
@@ -40,7 +40,12 @@ class MainActivity : AppCompatActivity() {
         hideStatusBar()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val permissions = arrayOf<String>(permission.BLUETOOTH_SCAN, permission.BLUETOOTH_CONNECT, permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION)
+        val permissions = arrayOf<String>(permission.BLUETOOTH_SCAN,
+                permission.BLUETOOTH_CONNECT,
+                permission.ACCESS_COARSE_LOCATION,
+                permission.ACCESS_FINE_LOCATION,
+                permission.READ_EXTERNAL_STORAGE,
+                READ_MEDIA_VIDEO)
         if (!hasPermissions(this, permissions)) {
             ActivityCompat.requestPermissions(this, permissions, 1)
         }
