@@ -13,31 +13,31 @@ import com.example.mymultiplayer.model.LanguageModel
 import com.squareup.picasso.Picasso
 
 
-class CountryListAdapter(val activity: Activity) : RecyclerView.Adapter<CountryListAdapter.MyViewHolder>() {
+class LanguageListAdapter(val activity: Activity) : RecyclerView.Adapter<LanguageListAdapter.MyViewHolder>() {
 
     companion object {
-        private val TAG = CountryListAdapter::class.simpleName
+        private val TAG = LanguageListAdapter::class.simpleName
     }
 
-    private var countryList: List<LanguageModel>? = null
+    private var langList: List<LanguageModel>? = null
 
     fun setCountryList(countryList: List<LanguageModel>?) {
-        this.countryList = countryList
+        this.langList = countryList
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryListAdapter.MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LanguageListAdapter.MyViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.country_list_row, parent, false)
 
         return MyViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CountryListAdapter.MyViewHolder, position: Int) {
-        holder.bind(countryList?.get(position)!!, activity)
+    override fun onBindViewHolder(holder: LanguageListAdapter.MyViewHolder, position: Int) {
+        holder.bind(langList?.get(position)!!, activity)
     }
 
     override fun getItemCount(): Int {
-        if (countryList == null) return 0
-        else return countryList?.size!!
+        if (langList == null) return 0
+        else return langList?.size!!
     }
 
     class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {

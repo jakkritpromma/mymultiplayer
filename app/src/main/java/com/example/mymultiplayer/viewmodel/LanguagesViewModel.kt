@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.WindowManager
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mymultiplayer.R
@@ -24,9 +25,9 @@ class LanguagesViewModel : ViewModel() {
         return liveDataList
     }
 
-    fun makeAPICall() {
+    fun makeAPICall(fragmentActivity: FragmentActivity) {
         Log.d(TAG, "makeAPICall")
-        val builder = AlertDialog.Builder(MainActivity.mainActivity)
+        val builder = AlertDialog.Builder(fragmentActivity)
         builder.setView(R.layout.progress_layout)
         val progressDialog = builder.create()
         progressDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

@@ -17,51 +17,44 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.mymultiplayer.R
+import com.example.mymultiplayer.databinding.ActivityMainBinding
 import com.example.mymultiplayer.viewmodel.TimeViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
     companion object {
         val TAG = MainActivity::class.simpleName
-
-        @SuppressLint("StaticFieldLeak") lateinit var mainActivity: Activity
     }
-
     private var onSwipeTouchListener: OnSwipeTouchListener? = null
     private var tvUpdatedTime: TextView? = null
 
     @SuppressLint("MissingInflatedId") override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
-        mainActivity = this
         setContentView(R.layout.activity_main)
         hideStatusBar()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val PERMISSIONS = arrayOf<String>(permission.BLUETOOTH_SCAN, permission.BLUETOOTH_CONNECT, permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION)
-        if (!hasPermissions(this, PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, 1)
+        val permissions = arrayOf<String>(permission.BLUETOOTH_SCAN, permission.BLUETOOTH_CONNECT, permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION)
+        if (!hasPermissions(this, permissions)) {
+            ActivityCompat.requestPermissions(this, permissions, 1)
         }
 
-        onSwipeTouchListener = OnSwipeTouchListener(MainActivity.mainActivity, MainActivity.mainActivity.findViewById(R.id.fragment))
+        onSwipeTouchListener = OnSwipeTouchListener(this, findViewById(R.id.fragment))
         tvUpdatedTime = findViewById(R.id.tvUpdatedTime)
 
         val viewModel: TimeViewModel = ViewModelProvider(this).get(TimeViewModel::class.java)
         viewModel.liveData.observe(this) {
-            it?.let { tvUpdatedTime!!.setText(it.time) }
+            it?.let { tvUpdatedTime?.text = it.time }
         }
-        lifecycle.coroutineScope.launch {
-            while (true) {
-                val time = viewModel.getTime()
-                Log.d(TAG, "time: $time")
-                delay(1000L)
-            }
+
+        lifecycleScope.launch {
+            TimeViewModel.startFlow(viewModel)
         }
     }
 
@@ -123,9 +116,9 @@ class MainActivity : AppCompatActivity() {
             override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 var result = false
                 try {
-                    Log.d(MainActivity.TAG, "e1.x: " + e1!!.x + " e1.y: " + e1.y)
-                    Log.d(MainActivity.TAG, "e2.x: " + e2.x + " e2.y: " + e2.y)
-                    Log.d(MainActivity.TAG, "velocityX: $velocityX + velocityY: $velocityY")
+                    Log.d(TAG, "e1.x: " + e1!!.x + " e1.y: " + e1.y)
+                    Log.d(TAG, "e2.x: " + e2.x + " e2.y: " + e2.y)
+                    Log.d(TAG, "velocityX: $velocityX + velocityY: $velocityY")
                     val diffY = e2.y - e1.y
                     val diffX = e2.x - e1.x
                     if (Math.abs(diffX) > Math.abs(diffY)) {
@@ -147,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Log.e(MainActivity.TAG, "e: $e")
+                    Log.e(TAG, "e: $e")
                 }
                 return result
             }
@@ -155,12 +148,12 @@ class MainActivity : AppCompatActivity() {
 
         internal fun onSwipeRight() {
             Log.d(TAG, "onSwipeRight")
-            Navigation.findNavController(mainActivity, R.id.fragment).navigate(R.id.action_settingFragment_to_mainFragment)
+            Navigation.findNavController(context as Activity, R.id.fragment).navigate(R.id.action_settingFragment_to_mainFragment)
         }
 
         internal fun onSwipeLeft() {
             Log.d(TAG, "onSwipeLeft")
-            Navigation.findNavController(mainActivity, R.id.fragment).navigate(R.id.action_mainFragment_to_settingFragment)
+            Navigation.findNavController(context as Activity, R.id.fragment).navigate(R.id.action_mainFragment_to_settingFragment)
         }
 
         internal fun onSwipeTop() {

@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.databinding.FragmentMainBinding
 
-
 class MainFragment : Fragment() {
     private val TAG = MainFragment::class.simpleName
     private var binding: FragmentMainBinding? = null
@@ -25,7 +24,9 @@ class MainFragment : Fragment() {
         Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.tvMediaPlayer?.setOnClickListener { }
+        binding?.tvMediaPlayer?.setOnClickListener {
+            findNavController().navigate(R.id.action_mainFragment_to_playerFragment)
+        }
         binding?.tvBluetooth?.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_bluetoothFragment)
         }

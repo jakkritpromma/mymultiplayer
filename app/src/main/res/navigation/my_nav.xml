@@ -16,6 +16,7 @@
             app:exitAnim="@anim/slide_out_to_left"
             app:popEnterAnim="@anim/slide_in_from_left"
             app:popExitAnim="@anim/slide_out_to_right" />
+
         <action
             android:id="@+id/action_mainFragment_to_bluetoothFragment"
             app:destination="@+id/bluetoothFragment"
@@ -23,9 +24,18 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
+
         <action
             android:id="@+id/action_mainFragment_to_webFragment"
             app:destination="@id/webFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_playerFragment"
+            app:destination="@+id/playerFragment"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -88,6 +98,20 @@
         tools:layout="@layout/fragment_web">
         <action
             android:id="@+id/action_webFragment_to_mainFragment"
+            app:destination="@+id/mainFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/slide_out_to_right"
+            app:popUpTo="@+id/my_nav" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.example.mymultiplayer.view.PlayerFragment"
+        tools:layout="@layout/fragment_player">
+        <action
+            android:id="@+id/action_playerFragment_to_mainFragment"
             app:destination="@+id/mainFragment"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"

@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.findNavController
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.databinding.FragmentBluetoothBinding
@@ -58,11 +59,11 @@ class BluetoothFragment : Fragment() {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             requestEnableBluetooth.launch(enableBtIntent)
         } else {
-            btScan()
+            btScan(requireActivity())
         }
 
         binding!!.tvRefresh.setOnClickListener {
-            btScan()
+            btScan(requireActivity())
         }
         return view
     }
@@ -73,9 +74,9 @@ class BluetoothFragment : Fragment() {
         binding = null
     }
 
-    fun btScan() {
+    fun btScan(fragmentActivity: FragmentActivity) {
         Log.d(TAG, "Bt Adapter is ENABLED!")
-        val builder = AlertDialog.Builder(MainActivity.mainActivity)
+        val builder = AlertDialog.Builder(fragmentActivity)
         builder.setView(R.layout.progress_layout)
         val progressDialog = builder.create()
         progressDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -93,7 +94,7 @@ class BluetoothFragment : Fragment() {
                         Log.d(TAG, "found")
                         val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
 
-                        if (ActivityCompat.checkSelfPermission(MainActivity.mainActivity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) { // TODO: Consider calling
+                        if (ActivityCompat.checkSelfPermission(fragmentActivity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) { // TODO: Consider calling
                             return
                         } else {
                             val deviceName = device?.name
@@ -112,7 +113,7 @@ class BluetoothFragment : Fragment() {
                         val fromWhere = arrayOf("C")
                         val listView = binding?.selectDeviceList
                         val itemName = intArrayOf(R.id.item_name)
-                        val simpleAdapter = SimpleAdapter(MainActivity.mainActivity, data, R.layout.item_list, fromWhere, itemName)
+                        val simpleAdapter = SimpleAdapter(fragmentActivity, data, R.layout.item_list, fromWhere, itemName)
                         listView!!.adapter = simpleAdapter
                         simpleAdapter.notifyDataSetChanged()
                         listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long -> //TODO connect
@@ -130,12 +131,12 @@ class BluetoothFragment : Fragment() {
         if (m_bluetoothAdapter?.isDiscovering() == true) {
             m_bluetoothAdapter?.cancelDiscovery();
         }
-        MainActivity.mainActivity.registerReceiver(receiver, intentFilter)
+        fragmentActivity.registerReceiver(receiver, intentFilter)
         m_bluetoothAdapter?.startDiscovery()
 
     }
 
-    @SuppressLint("MissingPermission") private fun pairedBtScan() {
+    @SuppressLint("MissingPermission") private fun pairedBtScan(fragmentActivity: FragmentActivity) {
         Log.d(TAG, "btScan")
         val listView = binding?.selectDeviceList
         val pairedDevices: Set<BluetoothDevice> = m_bluetoothAdapter?.bondedDevices as Set<BluetoothDevice>
@@ -157,20 +158,20 @@ class BluetoothFragment : Fragment() {
             }
             val fromWhere = arrayOf("C")
             val itemName = intArrayOf(R.id.item_name)
-            simpleAdapter = SimpleAdapter(MainActivity.mainActivity, data, R.layout.item_list, fromWhere, itemName)
+            simpleAdapter = SimpleAdapter(fragmentActivity, data, R.layout.item_list, fromWhere, itemName)
             listView!!.adapter = simpleAdapter
             simpleAdapter.notifyDataSetChanged()
             listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long -> //TODO connect paired
             }
         } else {
-            Toast.makeText(MainActivity.mainActivity, "No device found", Toast.LENGTH_LONG).show()
+            Toast.makeText(fragmentActivity, "No device found", Toast.LENGTH_LONG).show()
             return
         }
     }
 
     private val requestEnableBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) { // granted
-            btScan()
+            btScan(requireActivity())
         } else { // denied
         }
     }

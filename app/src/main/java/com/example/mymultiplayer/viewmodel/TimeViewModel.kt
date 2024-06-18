@@ -5,8 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mymultiplayer.model.TimeModel
 import com.example.mymultiplayer.view.MainActivity
-import com.example.mymultiplayer.view.MainActivity.Companion
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
@@ -15,7 +16,21 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 class TimeViewModel : ViewModel() {
-    private val TAG = TimeViewModel::class.simpleName
+    companion object {
+        private val TAG = TimeViewModel::class.simpleName
+        suspend fun startFlow(viewModel: TimeViewModel) {
+            val latestTime = flow {
+                while (true) {
+                    val time = viewModel.getTime()
+                    emit(time)
+                    Log.d(TAG, "delay(1000L) time: $time")
+                    delay(1000L)
+                }
+            }
+            latestTime.collect { value -> viewModel.liveData.postValue(TimeModel(value)) }
+        }
+    }
+
     var liveData: MutableLiveData<TimeModel> = MutableLiveData()
 
     fun getLiveDataObserver(): MutableLiveData<TimeModel> {

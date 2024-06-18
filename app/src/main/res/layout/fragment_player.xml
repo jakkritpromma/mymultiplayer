@@ -1,0 +1,83 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+    <androidx.media3.ui.PlayerView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        android:id="@+id/playerView"
+        app:use_controller="false"
+        app:shutter_background_color="@android:color/transparent"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal"
+        android:weightSum="11"
+        android:layout_margin="20dp">
+
+        <TextView
+            android:id="@+id/tvPrev"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="PREV"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:background="@drawable/main_button_selector"
+            android:layout_marginRight="10dp"></TextView>
+
+        <TextView
+            android:id="@+id/tvStop"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="STOP"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:background="@drawable/main_button_selector"
+            android:layout_marginRight="10dp"></TextView>
+
+        <TextView
+            android:id="@+id/tvPlay"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:text="Play"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:background="@drawable/main_button_selector"
+            android:layout_marginRight="10dp"></TextView>
+
+        <TextView
+            android:id="@+id/tvPause"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="Pause"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:background="@drawable/main_button_selector"
+            android:layout_marginRight="10dp"></TextView>
+
+        <TextView
+            android:id="@+id/tvNext"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="NEXT"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:background="@drawable/main_button_selector"></TextView>
+
+    </LinearLayout>
+</LinearLayout>

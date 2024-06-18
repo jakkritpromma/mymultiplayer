@@ -13,22 +13,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mymultiplayer.R
-import com.example.mymultiplayer.adapter.CountryListAdapter
+import com.example.mymultiplayer.adapter.LanguageListAdapter
 import com.example.mymultiplayer.databinding.FragmentLanguagesBinding
 import com.example.mymultiplayer.viewmodel.LanguagesViewModel
 
 class LanguagesFragment : Fragment() {
     private val TAG = LanguagesFragment::class.simpleName
     private var binding: FragmentLanguagesBinding? = null
-    private lateinit var recyclerAdapter: CountryListAdapter
+    private lateinit var recyclerAdapter: LanguageListAdapter
 
     @SuppressLint("NotifyDataSetChanged") override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
         binding = FragmentLanguagesBinding.inflate(inflater, container, false)
         val view = binding?.root
 
-        binding?.countryListRecyclerview?.layoutManager = LinearLayoutManager(MainActivity.mainActivity)
-        recyclerAdapter = CountryListAdapter(MainActivity.mainActivity)
+        binding?.countryListRecyclerview?.layoutManager = LinearLayoutManager(requireActivity())
+        recyclerAdapter = LanguageListAdapter(requireActivity())
         binding?.countryListRecyclerview?.adapter = recyclerAdapter
 
         val viewModel: LanguagesViewModel = ViewModelProvider(this).get(LanguagesViewModel::class.java)
@@ -37,12 +37,12 @@ class LanguagesFragment : Fragment() {
                 recyclerAdapter.setCountryList(it)
                 recyclerAdapter.notifyDataSetChanged()
             } else {
-                MainActivity.mainActivity.runOnUiThread(Runnable {
-                    Toast.makeText(MainActivity.mainActivity, "Error in getting list", Toast.LENGTH_SHORT).show()
+                requireActivity().runOnUiThread(Runnable {
+                    Toast.makeText(requireActivity(), "Error in getting list", Toast.LENGTH_SHORT).show()
                 })
             }
         })
-        viewModel.makeAPICall()
+        viewModel.makeAPICall(requireActivity())
 
         binding?.tvBackFromLanguages?.setOnClickListener {
             findNavController().navigate(R.id.action_langaugesFragment_to_settingFragment)
