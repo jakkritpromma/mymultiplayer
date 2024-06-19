@@ -27,9 +27,31 @@ class PlayerFragmentTest {
         assertEquals(expected, playerFragment.calculateNextIndex(index, size))
 
         //Case 3: index is lower than -1.
-        expected = 4
+        expected = 0
         index = -2
         size = 5
         assertEquals(expected, playerFragment.calculateNextIndex(index, size))
+    }
+
+    @Test
+    fun calculatePrevIndex() {
+        val playerFragment = PlayerFragment()
+        //Case 1: index is higher than size, but it is not lower than 0
+        var expected = 4
+        var index = 10
+        var size = 5
+        assertEquals(expected, playerFragment.calculatePrevIndex(index, size))
+
+        //Case 2: index is 0
+        expected = 0
+        index = 0
+        size = 5
+        assertEquals(expected, playerFragment.calculatePrevIndex(index, size))
+
+        //Case 3: index is lower than 0
+        expected = 0
+        index = -1
+        size = 5
+        assertEquals(expected, playerFragment.calculatePrevIndex(index, size))
     }
 }

@@ -59,17 +59,14 @@ class PlayerFragment : Fragment() {
         }
         binding?.tvNext?.setOnClickListener {
             indexVDO = calculateNextIndex(indexVDO, videoList.size)
-            Log.d(TAG, "indexVDO: " + indexVDO)
+            Log.d(TAG, "indexVDO: $indexVDO")
             val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
             player?.setMediaItem(mediaItem)
             player?.prepare()
         }
         binding?.tvPrev?.setOnClickListener {
-            indexVDO--
-            if(indexVDO < 0){
-                indexVDO = 0
-            }
-            Log.d(TAG, "indexVDO: " + indexVDO)
+            indexVDO = calculatePrevIndex(indexVDO, videoList.size)
+            Log.d(TAG, "indexVDO: $indexVDO")
             val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
             player?.setMediaItem(mediaItem)
             player?.prepare()
@@ -103,11 +100,11 @@ class PlayerFragment : Fragment() {
     @OptIn(UnstableApi::class)
     private fun initPlayer() {
         player = ExoPlayer.Builder(requireActivity()).build().apply {
-                    val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
-                    setMediaItem(mediaItem)
-                    prepare()
-                    addListener(playerListener)
-                }
+            val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
+            setMediaItem(mediaItem)
+            prepare()
+            addListener(playerListener)
+        }
     }
 
     @OptIn(UnstableApi::class)
@@ -145,17 +142,18 @@ class PlayerFragment : Fragment() {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             when (playbackState) {
-                STATE_ENDED -> {
+                STATE_ENDED       -> {
                     Log.d(TAG, "STATE_ENDED")
                     restartPlayer()
                 }
-                STATE_READY -> {
+
+                STATE_READY       -> {
                     Log.d(TAG, "STATE_READY onPlaybackStateChanged playWhenReady: " + player?.playWhenReady)
-                    if(player?.playWhenReady == true) {
+                    if (player?.playWhenReady == true) {
                         binding?.playerView?.player = player
                         Timer().schedule(object : TimerTask() { //set timer to prevent pre-initializing portrait vdo
                             override fun run() {
-                                requireActivity().runOnUiThread{
+                                requireActivity().runOnUiThread {
                                     play() //onPlaybackStateChanged
                                     binding?.playerView?.visibility = VISIBLE
                                 }
@@ -164,9 +162,11 @@ class PlayerFragment : Fragment() {
 
                     }
                 }
-                STATE_BUFFERING -> {
+
+                STATE_BUFFERING   -> {
                     Log.d(TAG, "STATE_BUFFERING")
                 }
+
                 Player.STATE_IDLE -> {
                     Log.d(TAG, "STATE_IDLE")
                 }
@@ -178,11 +178,30 @@ class PlayerFragment : Fragment() {
         try {
             var i = index
             i++
-            if (i >= size || i < 0) {
+            if (i >= size ) {
+                i = size - 1
+            } else if (i < 0) {
+                i = 0
+            }
+            return i
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e(TAG, "e: $e")
+        }
+        return 0;
+    }
+
+    fun calculatePrevIndex(index: Int, size: Int): Int {
+        try {
+            var i = index
+            i--
+            if (i < 0) {
+                i = 0
+            } else if (i > size) {
                 i = size - 1
             }
             return i
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             Log.e(TAG, "e: $e")
         }
