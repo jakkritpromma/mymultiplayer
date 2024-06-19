@@ -56,6 +56,8 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-hls:1.0.0")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
@@ -68,3 +70,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0-rc03")
 }
 
+
+tasks.withType(){
+
+}

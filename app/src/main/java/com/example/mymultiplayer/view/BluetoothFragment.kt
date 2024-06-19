@@ -81,6 +81,7 @@ class BluetoothFragment : Fragment() {
         val progressDialog = builder.create()
         progressDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         progressDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        progressDialog.setCancelable(false)
         progressDialog.show()
         var data: MutableList<Map<String?, Any?>?>? = ArrayList()
         val receiver = object : BroadcastReceiver() {
@@ -109,16 +110,21 @@ class BluetoothFragment : Fragment() {
                     }
 
                     BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-                        Log.d(TAG, "Device discovery finished")
-                        val fromWhere = arrayOf("C")
-                        val listView = binding?.selectDeviceList
-                        val itemName = intArrayOf(R.id.item_name)
-                        val simpleAdapter = SimpleAdapter(fragmentActivity, data, R.layout.item_list, fromWhere, itemName)
-                        listView!!.adapter = simpleAdapter
-                        simpleAdapter.notifyDataSetChanged()
-                        listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long -> //TODO connect
+                        try {
+                            Log.d(TAG, "Device discovery finished")
+                            val fromWhere = arrayOf("C")
+                            val listView = binding?.selectDeviceList
+                            val itemName = intArrayOf(R.id.item_name)
+                            val simpleAdapter = SimpleAdapter(fragmentActivity, data, R.layout.item_list, fromWhere, itemName)
+                            listView!!.adapter = simpleAdapter
+                            simpleAdapter.notifyDataSetChanged()
+                            listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long -> //TODO connect
+                            }
+                            progressDialog.dismiss()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Log.e(TAG, "e: $e")
                         }
-                        progressDialog.dismiss()
                     }
                 }
             }

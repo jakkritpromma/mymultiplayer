@@ -32,6 +32,7 @@ class LanguagesViewModel : ViewModel() {
         val progressDialog = builder.create()
         progressDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         progressDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        progressDialog.setCancelable(false)
         progressDialog.show()
 
         val retroInstance = RetroInstance.getRetroInstance()

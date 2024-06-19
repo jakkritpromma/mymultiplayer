@@ -58,10 +58,7 @@ class PlayerFragment : Fragment() {
             pause()
         }
         binding?.tvNext?.setOnClickListener {
-            indexVDO++
-            if(indexVDO >= videoList.size){
-                indexVDO--
-            }
+            indexVDO = calculateNextIndex(indexVDO, videoList.size)
             Log.d(TAG, "indexVDO: " + indexVDO)
             val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
             player?.setMediaItem(mediaItem)
@@ -175,5 +172,20 @@ class PlayerFragment : Fragment() {
                 }
             }
         }
+    }
+
+    fun calculateNextIndex(index: Int, size: Int): Int {
+        try {
+            var i = index
+            i++
+            if (i >= size || i < 0) {
+                i = size - 1
+            }
+            return i
+        }catch (e: Exception) {
+            e.printStackTrace()
+            Log.e(TAG, "e: $e")
+        }
+        return 0;
     }
 }
