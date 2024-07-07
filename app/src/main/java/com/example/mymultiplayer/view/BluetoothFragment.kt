@@ -4,8 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
-import android.app.Dialog
-import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -31,12 +29,16 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.findNavController
+import com.example.mymultiplayer.util.BluetoothConnector
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.databinding.FragmentBluetoothBinding
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.UUID
 
 
 class BluetoothFragment : Fragment() {
-    private val TAG = BluetoothFragment::class.simpleName
+    private val TAG = "bluetoothc" // BluetoothFragment::class.simpleName
     private var binding: FragmentBluetoothBinding? = null
     private var m_bluetoothAdapter: BluetoothAdapter? = null
 
@@ -84,6 +86,8 @@ class BluetoothFragment : Fragment() {
         progressDialog.setCancelable(false)
         progressDialog.show()
         var data: MutableList<Map<String?, Any?>?>? = ArrayList()
+        var mmOutputStream: OutputStream
+        var mmInputStream: InputStream
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
@@ -118,7 +122,32 @@ class BluetoothFragment : Fragment() {
                             val simpleAdapter = SimpleAdapter(fragmentActivity, data, R.layout.item_list, fromWhere, itemName)
                             listView!!.adapter = simpleAdapter
                             simpleAdapter.notifyDataSetChanged()
-                            listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long -> //TODO connect
+                            listView.onItemClickListener = AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                                val string = simpleAdapter.getItem(position) as HashMap<*, *>
+                                val name = string["A"]
+                                val m_address = string["B"]
+                                Log.d(TAG, "name: $name")
+                                Log.d(TAG, "address: $m_address")
+
+                                var m_myUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+                                var m_bluetoothSocket: BluetoothSocket? = null
+                                lateinit var m_bluetoothAdapter: BluetoothAdapter
+                                var m_isConnected: Boolean = false
+
+                                try {
+                                    if (m_bluetoothSocket == null || !m_isConnected) {
+                                        m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+                                        val device: BluetoothDevice = m_bluetoothAdapter.getRemoteDevice(m_address.toString())
+
+                                        val blueToothConnector = BluetoothConnector(device, true, m_bluetoothAdapter, null)
+                                        //val blueToothConnector = BluetoothConnector(device, false, m_bluetoothAdapter, null)
+                                        blueToothConnector.connect()
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    Log.e(TAG,"e: $e")
+                                }
+
                             }
                             progressDialog.dismiss()
                         } catch (e: Exception) {
