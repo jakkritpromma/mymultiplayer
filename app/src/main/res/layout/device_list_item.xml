@@ -5,11 +5,11 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/item_name"
+        android:id="@+id/textview_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding="10dp"
+        android:layout_margin="2dp"
+        android:padding="2dp"
         android:text="TextView"
         android:textColor="@color/white"
         android:textSize="20sp" />
