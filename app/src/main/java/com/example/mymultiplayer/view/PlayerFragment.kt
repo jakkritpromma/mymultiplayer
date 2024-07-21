@@ -10,6 +10,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
@@ -24,13 +25,14 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.example.mymultiplayer.databinding.FragmentPlayerBinding
 import com.example.mymultiplayer.model.Video
-import com.example.mymultiplayer.model.getAllVideos
+import com.example.mymultiplayer.viewmodel.MediaViewModel
 import java.util.Timer
 import java.util.TimerTask
 
 class PlayerFragment : Fragment() {
     private val TAG = PlayerFragment::class.simpleName
     private var binding: FragmentPlayerBinding? = null
+    private lateinit var mediaViewModel: MediaViewModel
     private val mediaUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
     private var player: ExoPlayer? = null
     private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
@@ -41,8 +43,15 @@ class PlayerFragment : Fragment() {
         Log.d(TAG, "onCreateView")
         binding = FragmentPlayerBinding.inflate(inflater, container, false)
         val view = binding?.root
+        return view
+    }
 
-        videoList = getAllVideos(requireActivity())
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated")
+        super.onViewCreated(view, savedInstanceState)
+
+        mediaViewModel = ViewModelProvider(requireActivity()).get(MediaViewModel::class.java)
+        videoList = mediaViewModel.getAllVideos(requireActivity())
         Log.d(TAG, "videoList.size: " + videoList.size)
 
         initPlayer()
@@ -71,8 +80,6 @@ class PlayerFragment : Fragment() {
             player?.setMediaItem(mediaItem)
             player?.prepare()
         }
-
-        return view
     }
 
     override fun onPause() {
