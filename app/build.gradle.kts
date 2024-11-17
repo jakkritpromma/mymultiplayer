@@ -1,6 +1,17 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.sonarqube")  // Ensure this plugin is included
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "your_project_key") // Replace with your actual project key
+        property("sonar.organization", "your_organization") // Replace with your organization (for SonarCloud users)
+        property("sonar.host.url", "http://localhost:9000") // Replace with your SonarQube server URL
+        property("sonar.login", "your_sonarqube_token") // Replace with your actual SonarQube token
+        property("sonar.kotlin.language.level", "1.8") // Kotlin version you're using (adjust if necessary)
+    }
 }
 
 android {
@@ -23,20 +34,22 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         viewBinding = true
     }
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
@@ -70,7 +83,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0-rc03")
 }
 
-
-tasks.withType(){
-
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
