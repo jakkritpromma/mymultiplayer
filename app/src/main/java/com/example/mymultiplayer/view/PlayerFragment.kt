@@ -1,6 +1,7 @@
 package com.example.mymultiplayer.view
 
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.annotation.OptIn
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.MediaItem
@@ -24,7 +26,7 @@ import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.example.mymultiplayer.databinding.FragmentPlayerBinding
-import com.example.mymultiplayer.model.Video
+import com.example.mymultiplayer.model.MediaModel
 import com.example.mymultiplayer.viewmodel.MediaViewModel
 import java.util.Timer
 import java.util.TimerTask
@@ -36,7 +38,7 @@ class PlayerFragment : Fragment() {
     private val mediaUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
     private var player: ExoPlayer? = null
     private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-    private lateinit var videoList: ArrayList<Video>
+    private lateinit var mediaModelList: ArrayList<MediaModel>
     private var indexVDO = 0;
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,37 +48,33 @@ class PlayerFragment : Fragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    @RequiresApi(Build.VERSION_CODES.Q) override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
-
         mediaViewModel = ViewModelProvider(requireActivity()).get(MediaViewModel::class.java)
-        videoList = mediaViewModel.getAllVideos(requireActivity())
-        Log.d(TAG, "videoList.size: " + videoList.size)
-
+        mediaModelList = mediaViewModel.getAllMedia(requireActivity())
+        Log.d(TAG, "videoList.size: " + mediaModelList.size)
         initPlayer()
         binding?.tvStop?.setOnClickListener {
             player?.playWhenReady = false;
             player?.seekTo(0)
             indexVDO = 0;
         }
-        binding?.tvPlay?.setOnClickListener {
-            play() //tvPlay
-        }
+        binding?.tvPlay?.setOnClickListener { play() } //tvPlay
         binding?.tvPause?.setOnClickListener {
             pause()
         }
         binding?.tvNext?.setOnClickListener {
-            indexVDO = calculateNextIndex(indexVDO, videoList.size)
+            indexVDO = calculateNextIndex(indexVDO, mediaModelList.size)
             Log.d(TAG, "indexVDO: $indexVDO")
-            val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
+            val mediaItem = MediaItem.fromUri(mediaModelList[indexVDO].artUri)
             player?.setMediaItem(mediaItem)
             player?.prepare()
         }
         binding?.tvPrev?.setOnClickListener {
-            indexVDO = calculatePrevIndex(indexVDO, videoList.size)
+            indexVDO = calculatePrevIndex(indexVDO, mediaModelList.size)
             Log.d(TAG, "indexVDO: $indexVDO")
-            val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
+            val mediaItem = MediaItem.fromUri(mediaModelList[indexVDO].artUri)
             player?.setMediaItem(mediaItem)
             player?.prepare()
         }
@@ -104,23 +102,23 @@ class PlayerFragment : Fragment() {
         binding = null
     }
 
-    @OptIn(UnstableApi::class)
-    private fun initPlayer() {
-        player = ExoPlayer.Builder(requireActivity()).build().apply {
-            val mediaItem = MediaItem.fromUri(videoList[indexVDO].artUri)
-            setMediaItem(mediaItem)
-            prepare()
-            addListener(playerListener)
+    @OptIn(UnstableApi::class) private fun initPlayer() {
+        Log.d(TAG, "mediaModelList.size: " + mediaModelList.size);
+        if (mediaModelList.size > 0) {
+            player = ExoPlayer.Builder(requireActivity()).build().apply {
+                val mediaItem = MediaItem.fromUri(mediaModelList[indexVDO].artUri)
+                setMediaItem(mediaItem)
+                prepare()
+                addListener(playerListener)
+            }
         }
     }
 
-    @OptIn(UnstableApi::class)
-    private fun getHlsMediaSource(): MediaSource {
+    @OptIn(UnstableApi::class) private fun getHlsMediaSource(): MediaSource {
         return HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(mediaUrl))
     }
 
-    @OptIn(UnstableApi::class)
-    private fun getProgressiveMediaSource(): MediaSource {
+    @OptIn(UnstableApi::class) private fun getProgressiveMediaSource(): MediaSource {
         return ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(Uri.parse(mediaUrl)))
     }
 
@@ -149,12 +147,12 @@ class PlayerFragment : Fragment() {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             when (playbackState) {
-                STATE_ENDED       -> {
+                STATE_ENDED -> {
                     Log.d(TAG, "STATE_ENDED")
                     restartPlayer()
                 }
 
-                STATE_READY       -> {
+                STATE_READY -> {
                     Log.d(TAG, "STATE_READY onPlaybackStateChanged playWhenReady: " + player?.playWhenReady)
                     if (player?.playWhenReady == true) {
                         binding?.playerView?.player = player
@@ -170,7 +168,7 @@ class PlayerFragment : Fragment() {
                     }
                 }
 
-                STATE_BUFFERING   -> {
+                STATE_BUFFERING -> {
                     Log.d(TAG, "STATE_BUFFERING")
                 }
 
@@ -185,7 +183,7 @@ class PlayerFragment : Fragment() {
         try {
             var i = index
             i++
-            if (i >= size ) {
+            if (i >= size) {
                 i = size - 1
             } else if (i < 0) {
                 i = 0

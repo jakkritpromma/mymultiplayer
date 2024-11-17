@@ -1,5 +1,6 @@
 package com.example.mymultiplayer.view
 
+import android.Manifest
 import android.Manifest.permission
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.BLUETOOTH_SCAN
@@ -21,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -35,56 +37,46 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        val TAG = "MainActivity-"
+        const val TAG = "MainActivity-"
     }
 
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var requireBtPermissions: ActivityResultLauncher<Array<String>>
     private var isBluetoothConnectGranted = false
     private var isAccessCoarseLocationGranted = false
-    private var isAccessFineLocationGranted = false;
+    private var isAccessFineLocationGranted = false
     private var isReadMediaVideoGranted = false
+    private var isReadMediaAudioGranted = false
+    private var isReadExternalStorageGranted = false
     private var onSwipeTouchListener: OnSwipeTouchListener? = null
     private var tvUpdatedTime: TextView? = null
     private val btViewModel: BtViewModel by viewModels()
 
-    @SuppressLint("MissingInflatedId") override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         hideStatusBar()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
         btViewModel.startUsingBy(this)
-
         onSwipeTouchListener = OnSwipeTouchListener(this, findViewById(R.id.fragment))
         tvUpdatedTime = findViewById(R.id.tvUpdatedTime)
-
         val viewModel: TimeViewModel = ViewModelProvider(this).get(TimeViewModel::class.java)
-        viewModel.liveData.observe(this) {
-            it?.let { tvUpdatedTime?.text = it.time }
-        }
-
-        lifecycleScope.launch {
-            TimeViewModel.startFlow(viewModel)
-        }
+        viewModel.liveData.observe(this) { it?.let { tvUpdatedTime?.text = it.time } }
+        lifecycleScope.launch { TimeViewModel.startFlow(viewModel) }
     }
 
     override fun onStart() {
         super.onStart()
+        permissionLauncher = registerForActivityResult(RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                Log.d(TAG, "${it.key} = ${it.value}")
+            }
 
-        permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            Log.d(TAG, "permissions :$permissions")
-            isBluetoothConnectGranted = permissions[permission.BLUETOOTH_CONNECT] ?: isBluetoothConnectGranted
-            isAccessCoarseLocationGranted = permissions[permission.ACCESS_COARSE_LOCATION] ?: isAccessCoarseLocationGranted
-            isAccessFineLocationGranted = permissions[permission.ACCESS_FINE_LOCATION] ?: isAccessFineLocationGranted
-            isReadMediaVideoGranted = permissions[permission.READ_MEDIA_VIDEO] ?: isReadMediaVideoGranted
-
-            if(isBluetoothConnectGranted && isAccessCoarseLocationGranted && isAccessFineLocationGranted) {
+            if (isBluetoothConnectGranted && isAccessCoarseLocationGranted && isAccessFineLocationGranted) {
                 requireBtPermissions.launch(arrayOf(BLUETOOTH_SCAN, ACCESS_BACKGROUND_LOCATION))
             }
         }
-
         requireBtPermissions = registerForActivityResult(RequestMultiplePermissions()) {
             fun checkPrm(p: String) = ContextCompat.checkSelfPermission(baseContext, p) == PackageManager.PERMISSION_GRANTED
             Log.d(TAG, "requireBtPermissions checkPrm(ACCESS_BACKGROUND_LOCATION): " + checkPrm(ACCESS_BACKGROUND_LOCATION))
@@ -93,43 +85,44 @@ class MainActivity : AppCompatActivity() {
             if (checkPrm(ACCESS_BACKGROUND_LOCATION) && checkPrm(BLUETOOTH_SCAN)) {
                 Log.d(TAG, "requireBtPermissions if (checkPrm(ACCESS_BACKGROUND_LOCATION) && checkPrm(BLUETOOTH_SCAN)) {")
                 CheckBluetooth.btPermitted = true
-
             } else {
                 Log.e(TAG, "requireBtPermissions The application can't run without the required permissions")
             }
         }
-
         requestPermissions()
     }
 
     private fun requestPermissions() {
         isBluetoothConnectGranted = ContextCompat.checkSelfPermission(this, permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
-
+        Log.d(TAG, "isBluetoothConnectGranted: $isBluetoothConnectGranted")
         isAccessCoarseLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
+        Log.d(TAG, "isAccessCoarseLocationGranted: $isAccessCoarseLocationGranted")
         isAccessFineLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
+        Log.d(TAG, "isAccessFineLocationGranted: $isAccessFineLocationGranted")
         isReadMediaVideoGranted = ContextCompat.checkSelfPermission(this, permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "isReadMediaVideoGranted: $isReadMediaVideoGranted")
+        isReadMediaAudioGranted = ContextCompat.checkSelfPermission(this, permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "isReadMediaAudioGranted: $isReadMediaAudioGranted")
+        isReadExternalStorageGranted = ContextCompat.checkSelfPermission(this, permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "isReadExternalStorageGranted: $isReadExternalStorageGranted")
 
         val permissionRequestList = ArrayList<String>()
-
         if (!isBluetoothConnectGranted) permissionRequestList.add(permission.BLUETOOTH_CONNECT)
+        /*if (!isAccessCoarseLocationGranted) permissionRequestList.add(permission.ACCESS_COARSE_LOCATION)
+        if (!isAccessFineLocationGranted) permissionRequestList.add(permission.ACCESS_FINE_LOCATION)*/
+        if (!isReadMediaVideoGranted) permissionRequestList.add(permission.READ_MEDIA_VIDEO)
+        if (!isReadMediaAudioGranted) permissionRequestList.add(permission.READ_MEDIA_AUDIO)
 
-        if (!isAccessCoarseLocationGranted) permissionRequestList.add(permission.ACCESS_COARSE_LOCATION)
-
-        if (!isAccessFineLocationGranted) permissionRequestList.add(permission.READ_MEDIA_VIDEO)
-
-        if (!isReadMediaVideoGranted) permissionRequestList.add(permission.ACCESS_FINE_LOCATION)
+        Log.d(TAG, "android.os.Build.VERSION.SDK_INT: " + android.os.Build.VERSION.SDK_INT)
+        //if(android.os.Build.VERSION.SDK_INT >= android.os.)
+        // TODO android 12 or lower if (!isReadExternalStorageGranted) permissionRequestList.add(permission.READ_EXTERNAL_STORAGE)
 
         if (permissionRequestList.isNotEmpty()) {
-            Log.d(TAG, "if (permissionRequestList.isNotEmpty()) {")
+            Log.d(TAG, "permissionRequestList.size: " + permissionRequestList.size)
             permissionLauncher.launch(permissionRequestList.toTypedArray())
         } else {
-            Log.d(TAG, "else 114")
-
-            CheckBluetooth(this) {
-                btViewModel.btAvailable = true
-            }
+            Log.d(TAG, "else empty")
+            CheckBluetooth(this) { btViewModel.btAvailable = true }
         }
     }
 
@@ -150,7 +143,6 @@ class MainActivity : AppCompatActivity() {
         hideStatusBar()
         return super.onTouchEvent(event)
     }
-
 
     class OnSwipeTouchListener internal constructor(context: Context, view: View) : View.OnTouchListener {
         private companion object {
