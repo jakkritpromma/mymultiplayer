@@ -47,6 +47,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    
+    lintOptions {
+        // Enable XML report generation for SonarQube integration
+        xmlReport = true
+        xmlOutput = file("$buildDir/reports/lint-results.xml")  // Corrected line
+    }
+
 }
 
 dependencies {
