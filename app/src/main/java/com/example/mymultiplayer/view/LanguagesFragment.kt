@@ -6,15 +6,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mymultiplayer.R
 import com.example.mymultiplayer.adapter.LanguageListAdapter
 import com.example.mymultiplayer.databinding.FragmentLanguagesBinding
+import com.example.mymultiplayer.view.compose.LanguagesScreen
 import com.example.mymultiplayer.viewmodel.LanguagesViewModel
 
 class LanguagesFragment : Fragment() {
@@ -25,14 +26,12 @@ class LanguagesFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged") override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
         binding = FragmentLanguagesBinding.inflate(inflater, container, false)
-        val view = binding?.root
-
         binding?.countryListRecyclerview?.layoutManager = LinearLayoutManager(requireActivity())
         recyclerAdapter = LanguageListAdapter(requireActivity())
         binding?.countryListRecyclerview?.adapter = recyclerAdapter
 
         val viewModel: LanguagesViewModel = ViewModelProvider(this).get(LanguagesViewModel::class.java)
-        viewModel.getLiveDataObserver().observe(viewLifecycleOwner, Observer {
+        /*viewModel.getLiveDataObserver().observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 recyclerAdapter.setCountryList(it)
                 recyclerAdapter.notifyDataSetChanged()
@@ -41,15 +40,21 @@ class LanguagesFragment : Fragment() {
                     Toast.makeText(requireActivity(), "Error in getting list", Toast.LENGTH_SHORT).show()
                 })
             }
-        })
+        })*/
         viewModel.makeAPICall(requireActivity())
 
         binding?.tvBackFromLanguages?.setOnClickListener {
             findNavController().navigate(R.id.action_langaugesFragment_to_settingFragment)
         }
 
-        return view
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                LanguagesScreen(findNavController(), viewModel)
+            }
+        }
     }
+
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView")

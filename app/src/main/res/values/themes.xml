@@ -7,4 +7,6 @@
     </style>
 
     <style name="Theme.MyMultiPlayer" parent="Base.Theme.MyMultiPlayer" />
+
+
 </resources>

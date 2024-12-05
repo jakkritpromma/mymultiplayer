@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.WindowManager
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,18 +14,14 @@ import com.example.mymultiplayer.R
 import com.example.mymultiplayer.model.LanguageModel
 import com.example.mymultiplayer.retrofit.RetroInstance
 import com.example.mymultiplayer.retrofit.RetroServiceInterface
-import com.example.mymultiplayer.view.MainActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class LanguagesViewModel : ViewModel() {
     private val TAG = LanguagesViewModel::class.simpleName
-    var liveDataList: MutableLiveData<List<LanguageModel>?> = MutableLiveData()
-
-    fun getLiveDataObserver(): MutableLiveData<List<LanguageModel>?> {
-        return liveDataList
-    }
+    private var _liveDataList = mutableStateListOf<LanguageModel>()
+    val itemList: SnapshotStateList<LanguageModel> get() = _liveDataList
 
     fun makeAPICall(fragmentActivity: FragmentActivity) {
         Log.d(TAG, "makeAPICall")
@@ -41,13 +39,16 @@ class LanguagesViewModel : ViewModel() {
         call.enqueue(object: Callback<List<LanguageModel>>{
             override fun onResponse(p0: Call<List<LanguageModel>>, response: Response<List<LanguageModel>>) {
                 Log.d(TAG, "response.body: ${response.body()}")
-                liveDataList.postValue(response.body())
+                val respondedList = response.body()
+                for (i in 0 until respondedList!!.size) {
+                    _liveDataList.add(respondedList.get(i))
+                }
                 progressDialog.dismiss()
             }
 
             override fun onFailure(p0: Call<List<LanguageModel>>, t: Throwable) {
                 Log.d(TAG, "t: ${t.message}")
-                liveDataList.postValue(null)
+                _liveDataList.clear()
                 progressDialog.dismiss()
             }
         })
