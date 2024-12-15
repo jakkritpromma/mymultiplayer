@@ -1,6 +1,5 @@
 MyMultiPlayer: Sample App
-
-According to the latest commit, this repository contains a sample app that implements MVVM architecture using Kotlin, ExoPlayer, Webview, Retrofit, Flow and etc.
+This repository contains a sample app that implements MVVM architecture using Kotlin, ExoPlayer, Jetpack Compose, Webview, Retrofit, Flow and bluetooth connection.
 
 Main Features:
 1. Playing videos recorded by your camera
