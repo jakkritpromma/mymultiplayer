@@ -1,4 +1,4 @@
-MyMultiPlayer: An app for playing downloaded songs, scanning and connecting bluetooth devices, browsing websites with the webview, displaying the current time from the time server and showing countries and languages for the language selection (being develoepd).
+MyMultiPlayer: This is an Android application for playing downloaded songs, scanning and connecting bluetooth devices, browsing websites with the WebView, displaying the current time from the time server and showing countries and languages for the language selection (being developed).
 
 Privacy Policy [MyMultiPlayer]
 
