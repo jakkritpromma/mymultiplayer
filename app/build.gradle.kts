@@ -15,11 +15,11 @@ sonarqube {
 }
 
 android {
-    namespace = "com.example.mymultiplayer"
+    namespace = "com.jakkagaku.mymultiplayer"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.mymultiplayer"
+        applicationId = "com.jakkagaku.mymultiplayer"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

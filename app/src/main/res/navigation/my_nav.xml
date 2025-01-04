@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.mymultiplayer.view.MainFragment"
+        android:name="com.jakkagaku.mymultiplayer.view.MainFragment"
         tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_settingFragment"
@@ -44,7 +44,7 @@
 
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.example.mymultiplayer.view.SettingFragment"
+        android:name="com.jakkagaku.mymultiplayer.view.SettingFragment"
         tools:layout="@layout/fragment_setting">
         <action
             android:id="@+id/action_settingFragment_to_mainFragment"
@@ -66,7 +66,7 @@
 
     <fragment
         android:id="@+id/languagesFragment"
-        android:name="com.example.mymultiplayer.view.LanguagesFragment"
+        android:name="com.jakkagaku.mymultiplayer.view.LanguagesFragment"
         tools:layout="@layout/fragment_languages">
         <action
             android:id="@+id/action_langaugesFragment_to_settingFragment"
@@ -80,7 +80,7 @@
 
     <fragment
         android:id="@+id/bluetoothFragment"
-        android:name="com.example.mymultiplayer.view.BluetoothFragment"
+        android:name="com.jakkagaku.mymultiplayer.view.BluetoothFragment"
         tools:layout="@layout/fragment_bluetooth">
         <action
             android:id="@+id/action_bluetoothFragment_to_mainFragment"
@@ -94,7 +94,7 @@
 
     <fragment
         android:id="@+id/webFragment"
-        android:name="com.example.mymultiplayer.view.WebFragment"
+        android:name="com.jakkagaku.mymultiplayer.view.WebFragment"
         tools:layout="@layout/fragment_web">
         <action
             android:id="@+id/action_webFragment_to_mainFragment"
@@ -108,7 +108,7 @@
 
     <fragment
         android:id="@+id/playerFragment"
-        android:name="com.example.mymultiplayer.view.PlayerFragment"
+        android:name="com.jakkagaku.mymultiplayer.view.PlayerFragment"
         tools:layout="@layout/fragment_player">
         <action
             android:id="@+id/action_playerFragment_to_mainFragment"
