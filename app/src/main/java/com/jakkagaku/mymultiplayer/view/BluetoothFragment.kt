@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -41,12 +42,16 @@ class BluetoothFragment : Fragment() {
         }
 
         val devicesObserver = Observer<List<BtDeviceInfoModel>> { newDevices ->
-            val deviceLabels = newDevices.map {
-                if (ContextCompat.checkSelfPermission(requireActivity(), permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) { // TODO: Consider calling
-                    """|${it.device.name ?: "Unknown Name"} ${it.device.address} BOUND: ${it.bound}""".trimMargin()
+            if (newDevices != null) {
+                val deviceLabels = newDevices.map {
+                    if (context?.let { it1 -> ActivityCompat.checkSelfPermission(it1.applicationContext, permission.BLUETOOTH_CONNECT) } != PackageManager.PERMISSION_GRANTED) { // TODO: Consider calling
+                        return@Observer
+                    }
+                    """|${it.device.name ?: "Unknown Name"} ${it.device.address} BOUND: ${it.bound}
+                """.trimMargin()
                 }
+                binding?.deviceList?.adapter = ArrayAdapter(requireContext(), R.layout.device_list_item, R.id.textview_item, deviceLabels)
             }
-            binding?.deviceList?.adapter = ArrayAdapter(requireContext(), R.layout.device_list_item, R.id.textview_item, deviceLabels)
         }
         btViewModel.devices.observe(viewLifecycleOwner, devicesObserver)
 

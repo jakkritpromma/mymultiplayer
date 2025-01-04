@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var requireBtPermissions: ActivityResultLauncher<Array<String>>
     private var isBluetoothConnectGranted = false
+    private var isBluetoothScanGranted = false
     private var isAccessCoarseLocationGranted = false
     private var isAccessFineLocationGranted = false
     private var isReadMediaVideoGranted = false
@@ -91,6 +92,8 @@ class MainActivity : AppCompatActivity() {
     private fun requestPermissions() {
         isBluetoothConnectGranted = ContextCompat.checkSelfPermission(this, permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "isBluetoothConnectGranted: $isBluetoothConnectGranted")
+        isBluetoothScanGranted = ContextCompat.checkSelfPermission(this, permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "isBluetoothScanGranted: $isBluetoothScanGranted")
         isAccessCoarseLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "isAccessCoarseLocationGranted: $isAccessCoarseLocationGranted")
         isAccessFineLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -104,6 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         val permissionRequestList = ArrayList<String>()
         if (!isBluetoothConnectGranted) permissionRequestList.add(permission.BLUETOOTH_CONNECT)
+        if (!isBluetoothScanGranted) permissionRequestList.add(permission.BLUETOOTH_SCAN)
         /*if (!isAccessCoarseLocationGranted) permissionRequestList.add(permission.ACCESS_COARSE_LOCATION)
         if (!isAccessFineLocationGranted) permissionRequestList.add(permission.ACCESS_FINE_LOCATION)*/
         if (!isReadMediaVideoGranted) permissionRequestList.add(permission.READ_MEDIA_VIDEO)
