@@ -1,5 +1,6 @@
 package com.jakkagaku.mymultiplayer.view
 
+import android.Manifest
 import android.Manifest.permission
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.BLUETOOTH_SCAN
@@ -19,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var requireBtPermissions: ActivityResultLauncher<Array<String>>
     private var isBluetoothConnectGranted = false
     private var isBluetoothScanGranted = false
+    private var isBackGroundLocationGranted = false
     private var isAccessCoarseLocationGranted = false
     private var isAccessFineLocationGranted = false
     private var isReadMediaVideoGranted = false
@@ -48,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var onSwipeTouchListener: OnSwipeTouchListener? = null
     private var tvUpdatedTime: TextView? = null
     private val btViewModel: BtViewModel by viewModels()
+    private val PERMISSION_REQUEST_CODE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
@@ -67,11 +71,19 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         permissionLauncher = registerForActivityResult(RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
-                Log.d(TAG, "${it.key} = ${it.value}")
-            }
-
-            if (isBluetoothConnectGranted && isAccessCoarseLocationGranted && isAccessFineLocationGranted) {
-                requireBtPermissions.launch(arrayOf(BLUETOOTH_SCAN, ACCESS_BACKGROUND_LOCATION))
+                val permission = it.key
+                val result = it.value
+                Log.d(TAG, "permission: ${permission} = ${result}")
+                if(permission.contains("android.permission.ACCESS_FINE_LOCATION") && result){
+                    //Starting from Android 10 (API 29),
+                    // you need to request foreground permission (ACCESS_FINE_LOCATION) first,
+                    // and background permission (ACCESS_BACKGROUND_LOCATION) separately if needed.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), PERMISSION_REQUEST_CODE)
+                        }
+                    }
+                }
             }
         }
         requireBtPermissions = registerForActivityResult(RequestMultiplePermissions()) {
@@ -94,24 +106,26 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "isBluetoothConnectGranted: $isBluetoothConnectGranted")
         isBluetoothScanGranted = ContextCompat.checkSelfPermission(this, permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "isBluetoothScanGranted: $isBluetoothScanGranted")
-        isAccessCoarseLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        Log.d(TAG, "isAccessCoarseLocationGranted: $isAccessCoarseLocationGranted")
-        isAccessFineLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        Log.d(TAG, "isAccessFineLocationGranted: $isAccessFineLocationGranted")
+        isBackGroundLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "isBackGroundLocationGranted: $isBackGroundLocationGranted")
         isReadMediaVideoGranted = ContextCompat.checkSelfPermission(this, permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "isReadMediaVideoGranted: $isReadMediaVideoGranted")
         isReadMediaAudioGranted = ContextCompat.checkSelfPermission(this, permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "isReadMediaAudioGranted: $isReadMediaAudioGranted")
         isReadExternalStorageGranted = ContextCompat.checkSelfPermission(this, permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "isReadExternalStorageGranted: $isReadExternalStorageGranted")
+        isAccessCoarseLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "isAccessCoarseLocationGranted: $isAccessCoarseLocationGranted")
+        isAccessFineLocationGranted = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "isAccessFineLocationGranted: $isAccessFineLocationGranted")
 
         val permissionRequestList = ArrayList<String>()
         if (!isBluetoothConnectGranted) permissionRequestList.add(permission.BLUETOOTH_CONNECT)
         if (!isBluetoothScanGranted) permissionRequestList.add(permission.BLUETOOTH_SCAN)
-        /*if (!isAccessCoarseLocationGranted) permissionRequestList.add(permission.ACCESS_COARSE_LOCATION)
-        if (!isAccessFineLocationGranted) permissionRequestList.add(permission.ACCESS_FINE_LOCATION)*/
         if (!isReadMediaVideoGranted) permissionRequestList.add(permission.READ_MEDIA_VIDEO)
         if (!isReadMediaAudioGranted) permissionRequestList.add(permission.READ_MEDIA_AUDIO)
+        if (!isAccessCoarseLocationGranted) permissionRequestList.add(permission.ACCESS_COARSE_LOCATION)
+        if (!isAccessFineLocationGranted) permissionRequestList.add(permission.ACCESS_FINE_LOCATION)
 
         Log.d(TAG, "android.os.Build.VERSION.SDK_INT: " + android.os.Build.VERSION.SDK_INT)
         //if(android.os.Build.VERSION.SDK_INT >= android.os.)
