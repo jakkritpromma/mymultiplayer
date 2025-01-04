@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -37,8 +36,13 @@ class BluetoothFragment : Fragment() {
         btViewModel = ViewModelProvider(requireActivity()).get(BtViewModel::class.java)
 
         binding?.deviceList?.setOnItemClickListener { parent, _, pos, _ ->
-            val btAddress = (parent.getItemAtPosition(pos) as String).lines()[1]
-            btViewModel.selectDevice(btAddress)
+            Log.d(TAG, "lines().size:" + (parent.getItemAtPosition(pos) as String).lines().size)
+            Log.d(TAG, "lines().get(0):" + (parent.getItemAtPosition(pos) as String).lines().get(0))
+            val item = (parent.getItemAtPosition(pos) as String).lines()[0]
+            Log.d(TAG, "lines()[0]:" + item)
+            val MacAddress = extractMacAddress(item)
+            Log.d(TAG, "MacAddress: " + MacAddress);
+            btViewModel.selectDevice(MacAddress!!)
         }
 
         val devicesObserver = Observer<List<BtDeviceInfoModel>> { newDevices ->
@@ -47,8 +51,7 @@ class BluetoothFragment : Fragment() {
                     if (context?.let { it1 -> ActivityCompat.checkSelfPermission(it1.applicationContext, permission.BLUETOOTH_CONNECT) } != PackageManager.PERMISSION_GRANTED) { // TODO: Consider calling
                         return@Observer
                     }
-                    """|${it.device.name ?: "Unknown Name"} ${it.device.address} BOUND: ${it.bound}
-                """.trimMargin()
+                    """|${it.device.name ?: "Unknown Name"} Address: ${it.device.address} BOUND: ${it.bound}""".trimMargin()
                 }
                 binding?.deviceList?.adapter = ArrayAdapter(requireContext(), R.layout.device_list_item, R.id.textview_item, deviceLabels)
             }
@@ -57,6 +60,16 @@ class BluetoothFragment : Fragment() {
 
         binding?.tvBack?.setOnClickListener {
             findNavController().navigate(R.id.action_bluetoothFragment_to_mainFragment)
+        }
+    }
+
+    fun extractMacAddress(input: String): String? {
+        val start = input.indexOf("Address: ") + "Address: ".length
+        val end = input.indexOf(" BOUND")
+        return if (start != -1 && end != -1) {
+            input.substring(start, end)
+        } else {
+            ""
         }
     }
 
