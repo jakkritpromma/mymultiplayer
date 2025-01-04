@@ -19,8 +19,7 @@ class MediaViewModel() : ViewModel() {
         var sortValue: Int = sortEditor.getInt("sortValue", 0)
         var folderList = ArrayList<Folder>()
         val tempList = ArrayList<MediaModel>()
-        val tempFolderList = ArrayList<String>()
-        /*  val projection = arrayOf(
+        val tempFolderList = ArrayList<String>()/*  val projection = arrayOf(
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.SIZE,
             MediaStore.Audio.Media._ID,
@@ -42,7 +41,9 @@ class MediaViewModel() : ViewModel() {
             val titleMD = cursor.getString(cursor.getColumnIndex(MediaStore.Downloads.TITLE))
             Log.d(TAG, "titleMD: $titleMD")
             val titleC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+            Log.d(TAG, "titleC : $titleC ")
             val idC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
+            Log.d(TAG, "idC: $idC")
             val folderC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME))
             val folderIdC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.BUCKET_ID))
             val sizeC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE))
@@ -54,8 +55,9 @@ class MediaViewModel() : ViewModel() {
                 val file = File(pathC)
                 val artUriC = Uri.fromFile(file)
                 val mediaModel = MediaModel(title = titleC, id = idC, folderName = folderC, duration = durationC, size = sizeC, path = pathC, artUri = artUriC)
-                if (file.exists()) tempList.add(mediaModel)
-
+                if (file.exists()) {
+                    if (folderC.contains("Download")) tempList.add(mediaModel)
+                }
                 if (!tempFolderList.contains(folderC)) {
                     tempFolderList.add(folderC)
                     folderList.add(Folder(id = folderIdC, folderName = folderC))

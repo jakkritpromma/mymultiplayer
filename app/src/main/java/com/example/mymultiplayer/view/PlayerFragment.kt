@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
@@ -39,7 +38,7 @@ class PlayerFragment : Fragment() {
     private var player: ExoPlayer? = null
     private val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
     private lateinit var mediaModelList: ArrayList<MediaModel>
-    private var indexVDO = 0;
+    private var indexMedia = 0;
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
@@ -58,26 +57,27 @@ class PlayerFragment : Fragment() {
         binding?.tvStop?.setOnClickListener {
             player?.playWhenReady = false;
             player?.seekTo(0)
-            indexVDO = 0;
+            indexMedia = 0;
         }
         binding?.tvPlay?.setOnClickListener { play() } //tvPlay
         binding?.tvPause?.setOnClickListener {
             pause()
         }
         binding?.tvNext?.setOnClickListener {
-            indexVDO = calculateNextIndex(indexVDO, mediaModelList.size)
-            Log.d(TAG, "indexVDO: $indexVDO")
-            val mediaItem = MediaItem.fromUri(mediaModelList[indexVDO].artUri)
+            indexMedia = calculateNextIndex(indexMedia, mediaModelList.size)
+            Log.d(TAG, "indexVDO: $indexMedia")
+            val mediaItem = MediaItem.fromUri(mediaModelList[indexMedia].artUri)
             player?.setMediaItem(mediaItem)
             player?.prepare()
         }
         binding?.tvPrev?.setOnClickListener {
-            indexVDO = calculatePrevIndex(indexVDO, mediaModelList.size)
-            Log.d(TAG, "indexVDO: $indexVDO")
-            val mediaItem = MediaItem.fromUri(mediaModelList[indexVDO].artUri)
+            indexMedia = calculatePrevIndex(indexMedia, mediaModelList.size)
+            Log.d(TAG, "indexVDO: $indexMedia")
+            val mediaItem = MediaItem.fromUri(mediaModelList[indexMedia].artUri)
             player?.setMediaItem(mediaItem)
             player?.prepare()
         }
+
     }
 
     override fun onPause() {
@@ -106,7 +106,7 @@ class PlayerFragment : Fragment() {
         Log.d(TAG, "mediaModelList.size: " + mediaModelList.size);
         if (mediaModelList.size > 0) {
             player = ExoPlayer.Builder(requireActivity()).build().apply {
-                val mediaItem = MediaItem.fromUri(mediaModelList[indexVDO].artUri)
+                val mediaItem = MediaItem.fromUri(mediaModelList[indexMedia].artUri)
                 setMediaItem(mediaItem)
                 prepare()
                 addListener(playerListener)
@@ -160,11 +160,13 @@ class PlayerFragment : Fragment() {
                             override fun run() {
                                 requireActivity().runOnUiThread {
                                     play() //onPlaybackStateChanged
-                                    binding?.playerView?.visibility = VISIBLE
+                                    //TODO binding?.playerView?.visibility = VISIBLE
+                                    val curLTitle = mediaModelList[indexMedia].title
+                                    Log.d(TAG, "curLTitle: $curLTitle")
+                                    binding?.textViewTitle?.text = "Title: "  + curLTitle
                                 }
                             }
                         }, 100)
-
                     }
                 }
 
@@ -176,6 +178,13 @@ class PlayerFragment : Fragment() {
                     Log.d(TAG, "STATE_IDLE")
                 }
             }
+        }
+
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+            val curLTitle = mediaModelList[indexMedia].title
+            Log.d(TAG, "curLTitle: $curLTitle")
+            binding?.textViewTitle?.text = "Title: "  + curLTitle
         }
     }
 
