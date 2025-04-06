@@ -138,6 +138,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.33.2-alpha")
 
     implementation("io.coil-kt:coil-compose:2.4.0")
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 }
 
 tasks.withType<Test> {

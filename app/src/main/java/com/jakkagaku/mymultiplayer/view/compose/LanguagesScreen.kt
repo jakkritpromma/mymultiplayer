@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.jakkagaku.mymultiplayer.viewmodel.LanguagesViewModel
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -28,12 +32,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.jakkagaku.mymultiplayer.R
+import com.jakkagaku.mymultiplayer.model.LanguageModel
+import com.jakkagaku.mymultiplayer.retrofit.LanguageApiResult
+import com.jakkagaku.mymultiplayer.viewmodel.LanguagesViewModel
 
-@Composable fun LanguagesScreen(navController: NavController, languagesViewModel: LanguagesViewModel = viewModel()) {
+@Composable fun LanguageListScreen(navController: NavController, languagesViewModel: LanguagesViewModel = viewModel()) {
     val tag = "LanguagesScreen"
     Box(modifier = Modifier
         .fillMaxSize()
-        .padding(50.dp)
+        .padding(20.dp)
         .clip(RoundedCornerShape(10.dp))
         .background(brush = Brush.verticalGradient(colors = listOf(Color.White, Color(0xFF1F1F1F))))) {
         Box(modifier = Modifier
@@ -41,46 +48,31 @@ import com.jakkagaku.mymultiplayer.R
             .padding(5.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(Color.Gray)) {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(20.dp)) {
-                items(languagesViewModel.itemList.size) { i ->
-                    Row(modifier = Modifier.height(80.dp)) {
-                        val data = languagesViewModel.itemList.get(i)
-                        val mutableSetFlags: MutableSet<String>? = data.flags?.keySet()
-                        if (mutableSetFlags != null) {
-                            Log.d(tag, "mutableSetFlags.toList().get(0): " + mutableSetFlags.toList().get(0))
-                            val firstKey = mutableSetFlags.toList().get(0)
-                            val firstValue = data.flags.get(firstKey).toString()
-                            val firstImgLink = firstValue.substring(1, firstValue.length - 1)
-                            Log.d(tag, "firstImgLink: $firstImgLink")
-
-                            Image(
-                                modifier = Modifier.weight(2f),
-                                painter = rememberAsyncImagePainter(firstImgLink),
-                                contentDescription = "Image from URL",
-                            )
-                        }
-                        Column(modifier = Modifier.weight(8f)) {
-                            val commonName = data.name?.get("common").toString()
-                            Text(modifier = Modifier.weight(1f), fontSize = 20.sp, color = Color.Black, text = commonName.substring(1, commonName.length - 1), style = TextStyle(fontWeight = FontWeight.Bold))
-                            val mutableSetLang: MutableSet<String>? = data.languages?.keySet()
-                            if (mutableSetLang != null) {
-                                Log.d(tag, "mutableSet.toList().get(0): " + mutableSetLang.toList().get(0))
-                                val firstKey = mutableSetLang.toList().get(0)
-                                val firstValue = data.languages.get(firstKey).toString()
-                                val language = firstValue.substring(1, firstValue.length - 1)
-                                Log.d(tag, "language: $language")
-                                Text(modifier = Modifier.weight(1f), fontSize = 20.sp, color = Color.Black, text = language)
-                            }
+            val state = languagesViewModel.languageState
+            when (state) {
+                is LanguageApiResult.Loading -> {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Color.Gray)
+                    }
+                }
+                is LanguageApiResult.Success -> {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(20.dp)) {
+                        items(state.data) { language ->
+                            LanguageItem(language)
                         }
                     }
+                }
+                is LanguageApiResult.Error -> {
+                    Text(text = "Error: ${state.message}", color = Color.White, modifier = Modifier.padding(16.dp))
                 }
             }
             Box(modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(20.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(brush = Brush.verticalGradient(colors = listOf(Color.White, Color(0xFF1F1F1F)))
-                )) {
+                .background(brush = Brush.verticalGradient(colors = listOf(Color.White, Color(0xFF1F1F1F))))) {
                 GradientSelector(
                     "Back", 30, 5,
                     Color.White, Color.Black, Color.Black, Color.Gray, Color.Gray,
@@ -93,3 +85,27 @@ import com.jakkagaku.mymultiplayer.R
         }
     }
 }
+
+@Composable
+fun LanguageItem(language: LanguageModel) {
+    val name = language.name?.get("common")?.asString ?: "Unknown"
+    val flagUrl = language.flags?.get("png")?.asString
+    val firstKey = language.languages?.keySet()?.toList()?.get(0)
+    val lang = language.languages?.get(firstKey)?.asString
+    LaunchedEffect(flagUrl) {
+        Log.d("LanguageItem", "flagUrl: $flagUrl")
+    }
+    Row(modifier = Modifier.height(80.dp)) {
+        Image(
+            modifier = Modifier.weight(2f),
+            painter = rememberAsyncImagePainter(flagUrl),
+            contentDescription = "Image from URL",
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(8f)) {
+            Text(modifier = Modifier.weight(1f), text = lang.toString(), fontSize = 20.sp, color = Color.White, style = TextStyle(fontWeight = FontWeight.Bold))
+            Text(modifier = Modifier.weight(1f), text = name, color = Color.White, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
