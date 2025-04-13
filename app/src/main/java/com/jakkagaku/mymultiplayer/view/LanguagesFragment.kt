@@ -13,12 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jakkagaku.mymultiplayer.R
 import com.jakkagaku.mymultiplayer.adapter.LanguageListAdapter
 import com.jakkagaku.mymultiplayer.databinding.FragmentLanguagesBinding
+import com.jakkagaku.mymultiplayer.di.NetworkModule
 import com.jakkagaku.mymultiplayer.repository.LanguageRepository
 import com.jakkagaku.mymultiplayer.retrofit.ApiService
 import com.jakkagaku.mymultiplayer.retrofit.RetroInstance
 import com.jakkagaku.mymultiplayer.view.compose.LanguageListScreen
 import com.jakkagaku.mymultiplayer.viewmodel.LanguagesViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LanguagesFragment : Fragment() {
     private val TAG = LanguagesFragment::class.simpleName
     private var binding: FragmentLanguagesBinding? = null
@@ -34,7 +37,7 @@ class LanguagesFragment : Fragment() {
             findNavController().navigate(R.id.action_langaugesFragment_to_settingFragment)
         }
 
-        val retroInstance = RetroInstance.getRetroInstance()
+        val retroInstance = NetworkModule.provideRetrofit()
         val apiService = retroInstance.create(ApiService::class.java)
         val repo = LanguageRepository(apiService)
         val viewModel = LanguagesViewModel(repo)

@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.sonarqube")  // Ensure this plugin is included
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin") // ✅ THIS IS REQUIRED
 }
 
 sonarqube {
@@ -141,6 +143,9 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+
+    implementation("com.google.dagger:hilt-android:2.50")
+    kapt("com.google.dagger:hilt-compiler:2.50")
 }
 
 tasks.withType<Test> {

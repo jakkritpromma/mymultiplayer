@@ -30,9 +30,11 @@ import com.jakkagaku.mymultiplayer.R
 import com.jakkagaku.mymultiplayer.util.CheckBluetooth
 import com.jakkagaku.mymultiplayer.viewmodel.BtViewModel
 import com.jakkagaku.mymultiplayer.viewmodel.TimeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     companion object {
         const val TAG = "MainActivity-"

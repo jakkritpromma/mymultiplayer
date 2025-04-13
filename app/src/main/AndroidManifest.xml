@@ -41,6 +41,7 @@
     <uses-feature android:name="android.software.companion_device_setup" android:required="true"/>
 
     <application
+        android:name=".MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
