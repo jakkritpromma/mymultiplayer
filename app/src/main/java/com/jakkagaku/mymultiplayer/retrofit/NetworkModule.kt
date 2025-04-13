@@ -16,10 +16,13 @@ import javax.inject.Singleton
 object NetworkModule {
 
     @Provides
+    fun provideBaseUrl() = "https://restcountries.com/v3.1/"
+
+    @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit =
+    fun provideRetrofit(BASE_URL: String): Retrofit =
         Retrofit.Builder()
-            .baseUrl("https://restcountries.com/v3.1/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -29,7 +32,7 @@ object NetworkModule {
         retrofit.create(ApiService::class.java)
 
     @Provides
-    @Singleton
     fun provideLanguageRepository(apiService: ApiService): LanguageRepository =
         LanguageRepository(apiService)
 }
+
