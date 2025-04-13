@@ -8,7 +8,7 @@ Introduction Welcome to [MyMultiPlayer]! This Privacy Policy explains how we col
 
 Information Users' and devices' information are not collected and not shared.
 
-Your Rights Your rights depend on your location. For more information, contact us at [jakkagu@gmaul.com].
+Your Rights Your rights depend on your location. For more information, contact us at [jakkagu@gmail.com].
 
 Children's Privacy Our app is not intended for use by children under the age of [13/16]. We do not knowingly collect personal information from children.
 
