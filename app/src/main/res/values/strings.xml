@@ -6,4 +6,6 @@
     <string name="languages">Languages</string>
     <string name="back">Back</string>
     <string name="refresh">Refresh</string>
+    <string name="sign_in">Sign In</string>
+    <string name="default_web_client_id">588830046320-js6a1vtv5b64rc0tg53vd6adr268olna.apps.googleusercontent.com</string>
 </resources>

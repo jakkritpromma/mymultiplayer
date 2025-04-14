@@ -12,16 +12,42 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:weightSum="10">
+        <!--Google login-->
 
-        <TextView
-            android:id="@+id/tvUpdatedTime"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="00:00"
-            android:textColor="@color/white"
-            android:textSize="24sp"></TextView>
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"></View>
+
+            <TextView
+                android:id="@+id/tvUpdatedTime"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="7"
+                android:gravity="center"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:textSize="24sp"></TextView>
+
+            <TextView
+                android:id="@+id/tv_sign_in"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:background="@drawable/main_button_selector"
+                android:text="@string/sign_in"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:gravity="center" />
+        </LinearLayout>
+
 
         <fragment
             android:id="@+id/fragment"

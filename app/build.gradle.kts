@@ -1,18 +1,19 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.sonarqube")  // Ensure this plugin is included
+    id("org.sonarqube")
     id("kotlin-kapt")
-    id("dagger.hilt.android.plugin") // ✅ THIS IS REQUIRED
+    id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
 }
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "your_project_key") // Replace with your actual project key
-        property("sonar.organization", "your_organization") // Replace with your organization (for SonarCloud users)
-        property("sonar.host.url", "http://localhost:9000") // Replace with your SonarQube server URL
-        property("sonar.login", "your_sonarqube_token") // Replace with your actual SonarQube token
-        property("sonar.kotlin.language.level", "1.8") // Kotlin version you're using (adjust if necessary)
+        property("sonar.projectKey", "your_project_key")
+        property("sonar.organization", "your_organization")
+        property("sonar.host.url", "http://localhost:9000")
+        property("sonar.login", "your_sonarqube_token")
+        property("sonar.kotlin.language.level", "1.9")
     }
 }
 
@@ -26,7 +27,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -44,6 +44,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += listOf(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+        )
     }
 
     buildFeatures {
@@ -52,15 +56,8 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
-
-    lintOptions {
-        // Enable XML report generation for SonarQube integration
-        xmlReport = true
-        xmlOutput = file("$buildDir/reports/lint-results.xml")  // Corrected line
-    }
-
 }
 
 dependencies {
@@ -73,79 +70,62 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.picasso:picasso:2.8")
 
-    // fragments
     implementation("androidx.fragment:fragment-ktx:1.8.5")
-    implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.2")
 
     implementation("androidx.media3:media3-exoplayer:1.5.0")
     implementation("androidx.media3:media3-ui:1.5.0")
     implementation("androidx.media3:media3-exoplayer-hls:1.5.0")
 
-    testImplementation("junit:junit:4.13.2")
-    testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-analytics")
 
-    // Navigation Component
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.4")
     implementation("androidx.navigation:navigation-ui-ktx:2.8.4")
 
     implementation("commons-net:commons-net:3.3")
-
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
-    implementation(composeBom)
-            androidTestImplementation(composeBom)
+    implementation(platform("androidx.compose:compose-bom:2024.09.02"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.09.02"))
 
-            // Choose one of the following:
-            // Material Design 3
-            implementation("androidx.compose.material3:material3")
-    // or Material Design 2
+    implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material")
-    // or skip Material Design and build directly on top of foundational components
     implementation("androidx.compose.foundation:foundation")
-    // or only import the main APIs for the underlying toolkit systems,
-    // such as input and measurement/layout
     implementation("androidx.compose.ui:ui")
-
-    // Android Studio Preview support
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
-
-    // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
-    // Optional - Included automatically by material, only add when you need
-    // the icons but not the material library (e.g. when using Material3 or a
-    // custom design system based on Foundation)
     implementation("androidx.compose.material:material-icons-core")
-    // Optional - Add full set of material icons
     implementation("androidx.compose.material:material-icons-extended")
-    // Optional - Add window size utils
     implementation("androidx.compose.material3:material3-window-size-class")
-
-    // Optional - Integration with activities
     implementation("androidx.activity:activity-compose:1.9.3")
-    // Optional - Integration with ViewModels
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-    // Optional - Integration with LiveData
     implementation("androidx.compose.runtime:runtime-livedata")
-    // Optional - Integration with RxJava
     implementation("androidx.compose.runtime:runtime-rxjava2")
 
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.33.2-alpha")
-
     implementation("io.coil-kt:coil-compose:2.4.0")
-    testImplementation("org.mockito:mockito-core:5.2.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
     implementation("com.google.dagger:hilt-android:2.50")
     kapt("com.google.dagger:hilt-compiler:2.50")
+
+    implementation("androidx.credentials:credentials:1.2.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.2.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
 }
 
 tasks.withType<Test> {

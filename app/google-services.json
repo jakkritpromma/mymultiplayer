@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "524680072598",
+    "project_id": "mymultiplayer-2de23",
+    "storage_bucket": "mymultiplayer-2de23.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:524680072598:android:24aa344ddc534e95e121b7",
+        "android_client_info": {
+          "package_name": "com.jakkagaku.mymultiplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "524680072598-abe70ofpqf11uav4ovhqa7qq2q80ricm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNfLb5LInE0s8B4Psi1RlsBQc-AVSTasI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "524680072598-abe70ofpqf11uav4ovhqa7qq2q80ricm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

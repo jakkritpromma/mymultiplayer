@@ -22,10 +22,20 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.credentials.Credential
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.jakkagaku.mymultiplayer.R
 import com.jakkagaku.mymultiplayer.util.CheckBluetooth
 import com.jakkagaku.mymultiplayer.viewmodel.BtViewModel
@@ -51,9 +61,11 @@ class MainActivity : AppCompatActivity() {
     private var isReadMediaAudioGranted = false
     private var isReadExternalStorageGranted = false
     private var onSwipeTouchListener: OnSwipeTouchListener? = null
-    private var tvUpdatedTime: TextView? = null
     private val btViewModel: BtViewModel by viewModels()
     private val PERMISSION_REQUEST_CODE = 1
+    private lateinit var auth: FirebaseAuth
+    private var tvUpdatedTime: TextView? = null
+    private lateinit var tvSignIn: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
@@ -63,10 +75,17 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         btViewModel.startUsingBy(this)
         onSwipeTouchListener = OnSwipeTouchListener(this, findViewById(R.id.fragment))
-        tvUpdatedTime = findViewById(R.id.tvUpdatedTime)
         val viewModel: TimeViewModel = ViewModelProvider(this).get(TimeViewModel::class.java)
         viewModel.liveData.observe(this) { it?.let { tvUpdatedTime?.text = it.time } }
         lifecycleScope.launch { TimeViewModel.startFlow(viewModel) }
+
+        auth = FirebaseAuth.getInstance()
+
+        tvUpdatedTime = findViewById(R.id.tvUpdatedTime)
+        tvSignIn = findViewById(R.id.tv_sign_in)
+        tvSignIn.setOnClickListener {
+            startGoogleSignIn()
+        }
     }
 
     override fun onStart() {
@@ -101,6 +120,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         requestPermissions()
+
+        //val currentUser = auth.currentUser
     }
 
     private fun requestPermissions() {
@@ -239,5 +260,55 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         btViewModel.stopUsingBy(this)
+    }
+
+    private fun startGoogleSignIn() {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setServerClientId(getString(R.string.default_web_client_id))
+            .setFilterByAuthorizedAccounts(false)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        val credentialManager = CredentialManager.create(this)
+
+        lifecycleScope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    request = request,
+                    context = this@MainActivity
+                )
+                val credential = result.credential
+                handleSignIn(credential)
+            } catch (e: GetCredentialException) {
+                Log.e(TAG, "Google Sign-In failed", e)
+            }
+        }
+    }
+
+    private fun handleSignIn(credential: Credential) {
+        if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
+        } else {
+            Log.w(TAG, "Credential is not of type Google ID!")
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "signInWithCredential:success")
+                    val user = auth.currentUser
+
+                } else {
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+
+                }
+            }
     }
 }
