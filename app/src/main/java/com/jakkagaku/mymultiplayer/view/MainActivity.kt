@@ -16,6 +16,7 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.viewModels
@@ -34,6 +35,7 @@ import androidx.navigation.findNavController
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.jakkagaku.mymultiplayer.R
@@ -44,8 +46,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
-@AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint class MainActivity : AppCompatActivity() {
     companion object {
         const val TAG = "MainActivity-"
     }
@@ -95,8 +96,7 @@ class MainActivity : AppCompatActivity() {
                 val permission = it.key
                 val result = it.value
                 Log.d(TAG, "permission: ${permission} = ${result}")
-                if(permission.contains("android.permission.ACCESS_FINE_LOCATION") && result){
-                    //Starting from Android 10 (API 29),
+                if (permission.contains("android.permission.ACCESS_FINE_LOCATION") && result) { //Starting from Android 10 (API 29),
                     // you need to request foreground permission (ACCESS_FINE_LOCATION) first,
                     // and background permission (ACCESS_BACKGROUND_LOCATION) separately if needed.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -150,8 +150,7 @@ class MainActivity : AppCompatActivity() {
         if (!isAccessCoarseLocationGranted) permissionRequestList.add(permission.ACCESS_COARSE_LOCATION)
         if (!isAccessFineLocationGranted) permissionRequestList.add(permission.ACCESS_FINE_LOCATION)
 
-        Log.d(TAG, "android.os.Build.VERSION.SDK_INT: " + android.os.Build.VERSION.SDK_INT)
-        //if(android.os.Build.VERSION.SDK_INT >= android.os.)
+        Log.d(TAG, "android.os.Build.VERSION.SDK_INT: " + android.os.Build.VERSION.SDK_INT) //if(android.os.Build.VERSION.SDK_INT >= android.os.)
         // TODO android 12 or lower if (!isReadExternalStorageGranted) permissionRequestList.add(permission.READ_EXTERNAL_STORAGE)
 
         if (permissionRequestList.isNotEmpty()) {
@@ -263,23 +262,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startGoogleSignIn() {
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(getString(R.string.default_web_client_id))
-            .setFilterByAuthorizedAccounts(false)
-            .build()
-
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
+        val googleIdOption = GetGoogleIdOption.Builder().setServerClientId(getString(R.string.default_web_client_id)).setFilterByAuthorizedAccounts(false).build()
+        val request = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
         val credentialManager = CredentialManager.create(this)
-
         lifecycleScope.launch {
             try {
-                val result = credentialManager.getCredential(
-                    request = request,
-                    context = this@MainActivity
-                )
+                val result = credentialManager.getCredential(request = request, context = this@MainActivity)
                 val credential = result.credential
                 handleSignIn(credential)
             } catch (e: GetCredentialException) {
@@ -291,24 +279,19 @@ class MainActivity : AppCompatActivity() {
     private fun handleSignIn(credential: Credential) {
         if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-            firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
-        } else {
-            Log.w(TAG, "Credential is not of type Google ID!")
-        }
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
+            val credential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+            auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
-
+                    Toast.makeText(this, "Signed in with " + user?.email, Toast.LENGTH_LONG).show();
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
-
+                    Toast.makeText(this, "Failed to sign in.", Toast.LENGTH_LONG).show();
                 }
             }
+        } else {
+            Log.w(TAG, "Credential is not of type Google ID!")
+        }
     }
 }

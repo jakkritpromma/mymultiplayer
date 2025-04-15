@@ -44,7 +44,7 @@
                 android:background="@drawable/main_button_selector"
                 android:text="@string/sign_in"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:gravity="center" />
         </LinearLayout>
 
