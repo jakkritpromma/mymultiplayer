@@ -17,6 +17,7 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.viewModels
@@ -35,7 +36,6 @@ import androidx.navigation.findNavController
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.jakkagaku.mymultiplayer.R
@@ -71,6 +71,7 @@ import kotlinx.coroutines.launch
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         hideStatusBar()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -85,8 +86,15 @@ import kotlinx.coroutines.launch
         tvUpdatedTime = findViewById(R.id.tvUpdatedTime)
         tvSignIn = findViewById(R.id.tv_sign_in)
         tvSignIn.setOnClickListener {
-            startGoogleSignIn()
+            if (auth.currentUser != null) {
+                auth.signOut()
+                Toast.makeText(this, "Signed out", Toast.LENGTH_SHORT).show()
+                tvSignIn.text = getString(R.string.sign_in)
+            } else {
+                startGoogleSignIn()
+            }
         }
+        checkUserStatus()
     }
 
     override fun onStart() {
@@ -168,7 +176,7 @@ import kotlinx.coroutines.launch
     }
 
     private fun hideStatusBar() {
-        @Suppress("DEPRECATION") if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.hide(WindowInsets.Type.statusBars())
         } else {
             window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -285,6 +293,7 @@ import kotlinx.coroutines.launch
                     Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
                     Toast.makeText(this, "Signed in with " + user?.email, Toast.LENGTH_LONG).show();
+                    tvSignIn.setText(getString(R.string.sign_out))
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     Toast.makeText(this, "Failed to sign in.", Toast.LENGTH_LONG).show();
@@ -292,6 +301,17 @@ import kotlinx.coroutines.launch
             }
         } else {
             Log.w(TAG, "Credential is not of type Google ID!")
+        }
+    }
+
+    private fun checkUserStatus() {
+        val user = auth.currentUser
+        if (user != null) {
+            tvSignIn.text = getString(R.string.sign_out)
+            Log.d(TAG, "Already signed in as: ${user.email}")
+        } else {
+            tvSignIn.text = getString(R.string.sign_in)
+            Log.d(TAG, "No user is signed in.")
         }
     }
 }

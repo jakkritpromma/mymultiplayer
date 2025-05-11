@@ -7,5 +7,6 @@
     <string name="back">Back</string>
     <string name="refresh">Refresh</string>
     <string name="sign_in">Sign In</string>
+    <string name="sign_out">Sign Out</string>
     <string name="default_web_client_id">524680072598-abe70ofpqf11uav4ovhqa7qq2q80ricm.apps.googleusercontent.com</string>
 </resources>
