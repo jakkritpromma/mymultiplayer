@@ -41,7 +41,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.jakkagaku.mymultiplayer.R
 import com.jakkagaku.mymultiplayer.util.CheckBluetooth
 import com.jakkagaku.mymultiplayer.viewmodel.BtViewModel
-import com.jakkagaku.mymultiplayer.viewmodel.TimeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -65,7 +64,6 @@ import kotlinx.coroutines.launch
     private val btViewModel: BtViewModel by viewModels()
     private val PERMISSION_REQUEST_CODE = 1
     private lateinit var auth: FirebaseAuth
-    private var tvUpdatedTime: TextView? = null
     private lateinit var tvSignIn: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,13 +75,8 @@ import kotlinx.coroutines.launch
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         btViewModel.startUsingBy(this)
         onSwipeTouchListener = OnSwipeTouchListener(this, findViewById(R.id.fragment))
-        val viewModel: TimeViewModel = ViewModelProvider(this).get(TimeViewModel::class.java)
-        viewModel.liveData.observe(this) { it?.let { tvUpdatedTime?.text = it.time } }
-        lifecycleScope.launch { TimeViewModel.startFlow(viewModel) }
-
         auth = FirebaseAuth.getInstance()
 
-        tvUpdatedTime = findViewById(R.id.tvUpdatedTime)
         tvSignIn = findViewById(R.id.tv_sign_in)
         tvSignIn.setOnClickListener {
             if (auth.currentUser != null) {
