@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -25,12 +24,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jakkagaku.mymultiplayer.R
 import com.jakkagaku.mymultiplayer.model.LanguageModel
 import com.jakkagaku.mymultiplayer.retrofit.LanguageApiResult
@@ -48,7 +49,7 @@ import com.jakkagaku.mymultiplayer.viewmodel.LanguagesViewModel
             .padding(5.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(Color.Gray)) {
-            val state = languagesViewModel.languageState
+            val state by languagesViewModel.languageState.collectAsStateWithLifecycle()
             when (state) {
                 is LanguageApiResult.Loading -> {
                     Box(modifier = Modifier
@@ -57,15 +58,21 @@ import com.jakkagaku.mymultiplayer.viewmodel.LanguagesViewModel
                         CircularProgressIndicator(color = Color.Gray)
                     }
                 }
+
                 is LanguageApiResult.Success -> {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(20.dp)) {
-                        items(state.data) { language ->
-                            LanguageItem(language)
+                    val languages = (state as LanguageApiResult.Success<List<LanguageModel>>).data
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+                        items(languages.size) { index ->
+                            LanguageItem(languages[index])
                         }
                     }
                 }
+
                 is LanguageApiResult.Error -> {
-                    Text(text = "Error: ${state.message}", color = Color.White, modifier = Modifier.padding(16.dp))
+                    Text(text = "Error: ${(state as LanguageApiResult.Error).message}", color = Color.White, modifier = Modifier.padding(16.dp))
                 }
             }
             Box(modifier = Modifier
@@ -86,8 +93,7 @@ import com.jakkagaku.mymultiplayer.viewmodel.LanguagesViewModel
     }
 }
 
-@Composable
-fun LanguageItem(language: LanguageModel) {
+@Composable fun LanguageItem(language: LanguageModel) {
     val name = language.name?.get("common")?.asString ?: "Unknown"
     val flagUrl = language.flags?.get("png")?.asString
     val firstKey = language.languages?.keySet()?.toList()?.get(0)
@@ -108,4 +114,3 @@ fun LanguageItem(language: LanguageModel) {
         }
     }
 }
-
